@@ -1,0 +1,114 @@
+.layer-menu {
+    position: fixed;
+    width: 200px;
+    background-color: #1f2025;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+                0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.layer-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.layer-toggle {
+    position: fixed;
+    left: 5px;
+    top: 5px;
+    background: #1f2025;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.layer-toggle:hover {
+    background: #2a2b30;
+}
+
+.layer-list {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.layer-item {
+    padding: 12px 16px;
+    color: #e3e3e3;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    background-color: #1f2025;
+}
+
+.layer-item:hover {
+    background-color: #2a2b30;
+}
+
+.layer-item:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.layer-item:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.layer-item svg {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.layer-item.active {
+    background-color: #3a3b40;
+}
+
+.current-layer-display {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    background: #1f2025;
+    color: #e3e3e3;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.current-layer-display:hover {
+    background: #2a2b30;
+}
+
+.current-layer-display svg {
+    width: 20px;
+    height: 20px;
+}
+
+.current-layer-display.active + .layer-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    left: 10px;
+    right: auto;
+    top: 45px;
+} 

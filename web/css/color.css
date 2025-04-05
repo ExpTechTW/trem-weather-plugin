@@ -1,0 +1,42 @@
+#legend {
+    position: absolute;
+    bottom: 40px;
+    left: 5px;
+    background: #454546;
+    padding: 10px 10px;
+    border-radius: 4px;
+    color: white;
+    width: fit-content;
+}
+
+.color-scale {
+    width: 260px;
+    height: 20px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.scale-labels {
+    width: 260px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+.scale-labels span:last-child {
+    transform: translateX(0);
+}
+
+.scale-labels span:first-child {
+    transform: translateX(0);
+}
+
+.color-scale div {
+    flex: 1;
+    height: 100%;
+}

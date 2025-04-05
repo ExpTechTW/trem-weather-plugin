@@ -1,0 +1,91 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+#time-display {
+    position: absolute;
+    bottom: 5px;
+    left: 110px;
+    padding: 5px 10px;
+    background-color: #454546;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: "Manrope";
+}
+
+.nav-bar-buttons-wrapper {
+    font-family: "Manrope", sans-serif;
+}
+
+#reset-position {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    background-color: #454546;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#reset-position svg {
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+}
+
+#update-position {
+    position: absolute;
+    bottom: 5px;
+    left: 40px;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    background-color: #454546;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#update-position svg {
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+} 
+
+#toggle-layer {
+    position: absolute;
+    bottom: 5px;
+    left: 75px;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+    background-color: #454546;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

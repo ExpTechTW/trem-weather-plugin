@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<title>ExpTech Studio Weather Map</title>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.0.0/maplibre-gl.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.0.0/maplibre-gl.css" rel="stylesheet">
+    <link href="./css/radar.css" rel="stylesheet">
+    <link href="./css/color.css" rel="stylesheet">
+    <link href="./css/layer.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="./js/nav.js" defer></script>
+</head>
+
+<body>  
+    <div id="map"></div>
+    <div id="time-display"></div>
+    
+    <!-- <div id="legend">
+        <div class="color-scale"></div>
+        <div class="scale-labels">
+            <span>0</span>
+            <span>5</span>
+            <span>10</span>
+            <span>15</span>
+            <span>20</span>
+            <span>25</span>
+            <span>30</span>
+            <span>35</span>
+            <span>40</span>
+            <span>45</span>
+            <span>50</span>
+            <span>55</span>
+            <span>60</span>
+            <span>65</span>
+        </div>
+    </div> -->
+    
+    <button id="reset-position">
+        <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--gis" preserveAspectRatio="xMidYMid meet">
+            <path d="M43 0v13.166C27.944 16.03 16.03 27.944 13.166 43H0v14h13.166C16.03 72.056 27.944 83.97 43 86.834V100h14V86.834C72.056 83.97 83.97 72.056 86.834 57H100V43H86.834C83.97 27.944 72.056 16.03 57 13.166V0H43zm7 22.5A27.425 27.425 0 0 1 77.5 50A27.425 27.425 0 0 1 50 77.5A27.425 27.425 0 0 1 22.5 50A27.425 27.425 0 0 1 50 22.5z" fill="currentColor"></path>
+            <circle r="15" cy="50" cx="50" fill="currentColor"></circle>
+        </svg>
+    </button>
+
+    <button id="update-position">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+            <path d="M480-120q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-480q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-840q82 0 155.5 35T760-706v-94h80v240H600v-80h110q-41-56-101-88t-129-32q-117 0-198.5 81.5T200-480q0 117 81.5 198.5T480-200q105 0 183.5-68T756-440h82q-15 137-117.5 228.5T480-120Zm112-192L440-464v-216h80v184l128 128-56 56Z"/>
+        </svg>
+    </button>
+
+    <button id="toggle-layer">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M480-118 120-398l66-50 294 228 294-228 66 50-360 280Zm0-202L120-600l360-280 360 280-360 280Zm0-280Zm0 178 230-178-230-178-230 178 230 178Z"/>
+        </svg>
+    </button>
+
+    <script src="./js/map.js"></script>
+    <script src="./js/layer.js"></script>
+    <script src="./js/weather/radar.js"></script>
+    <script src="./js/weather/rain.js"></script>
+    <script src="./js/weather/temperature.js"></script>
+    <script src="./js/weather/humidity.js"></script>
+    <script src="./js/weather/pressure.js"></script>
+    <script src="./js/weather/wind.js"></script>
+    <script src="./js/weather/lightning.js"></script>
+    <!-- <script src="./js/color.js"></script> -->
+</body>
+</html>
