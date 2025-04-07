@@ -1,6 +1,5 @@
 .layer-menu {
     position: fixed;
-    width: 200px;
     background-color: #1f2025;
     z-index: 1000;
     opacity: 0;
