@@ -73,11 +73,12 @@ window.lightningLayer = {
                         level = 60;
                     }
 
+                    const iconName = `lightning-${type}-${level}`;
+
                     return {
                         type: 'Feature',
                         properties: {
-                            type: `${type}-${level}`,
-                            time: lightningTime
+                            iconName: iconName
                         },
                         geometry: {
                             type: 'Point',
@@ -105,7 +106,6 @@ map.on('load', async function() {
     
     for (const iconName of lightningIcons) {
         const imageUrl = `js/weather/icons/${iconName}.png`;
-        
         try {
             const response = await fetch(imageUrl);
             if (response.ok) {
@@ -122,26 +122,12 @@ map.on('load', async function() {
         }
     }
 
+    // 獲取最新時間
     const response = await fetch('https://api-1.exptech.dev/api/v1/meteor/lightning/list');
     const timeList = await response.json();
     const latestTime = timeList[timeList.length - 1];
 
-    // 添加時間選擇器事件監聽器
-    const timeSelector = document.getElementById('time-selector');
-    if (timeSelector) {
-        timeSelector.addEventListener('change', function() {
-            lightningLayer.updateTime(this.value);
-        });
-    }
-
-    const timeDisplay = document.getElementById('time-display');
-    const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
-        String(date.getMonth() + 1).padStart(2, '0') + '-' +
-        String(date.getDate()).padStart(2, '0') + ' ' +
-        String(date.getHours()).padStart(2, '0') + ':' +
-        String(date.getMinutes()).padStart(2, '0');
-
+    // 獲取閃電資料
     const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/lightning/${latestTime}`);
     const lightningData = await lightningResponse.json();
 
@@ -163,11 +149,12 @@ map.on('load', async function() {
                 level = 60;
             }
 
+            const iconName = `lightning-${type}-${level}`;
+
             return {
                 type: 'Feature',
                 properties: {
-                    type: `${type}-${level}`,
-                    time: lightningTime
+                    iconName: iconName
                 },
                 geometry: {
                     type: 'Point',
@@ -176,6 +163,7 @@ map.on('load', async function() {
             };
         });
 
+    // 添加資料來源
     map.addSource('lightning-data', {
         type: 'geojson',
         data: {
@@ -191,29 +179,34 @@ map.on('load', async function() {
         source: 'lightning-data',
         layout: {
             'visibility': 'none',
-            'icon-image': [
-                'match',
-                ['get', 'type'],
-                '1-5', 'lightning-1-5',
-                '1-10', 'lightning-1-10',
-                '1-30', 'lightning-1-30',
-                '1-60', 'lightning-1-60',
-                '0-5', 'lightning-0-5',
-                '0-10', 'lightning-0-10',
-                '0-30', 'lightning-0-30',
-                '0-60', 'lightning-0-60'
-            ],
+            'icon-image': ['get', 'iconName'],
             'icon-size': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
-                5, 0.5,
-                10, 1.3
+                5, 0.2,
+                10, 0.7
             ],
             'icon-allow-overlap': true,
             'icon-ignore-placement': true
         }
     });
+
+    // 添加時間選擇器事件監聽器
+    const timeSelector = document.getElementById('time-selector');
+    if (timeSelector) {
+        timeSelector.addEventListener('change', function() {
+            lightningLayer.updateTime(this.value);
+        });
+    }
+
+    const timeDisplay = document.getElementById('time-display');
+    const date = new Date(parseInt(latestTime));
+    timeDisplay.textContent = date.getFullYear() + '-' + 
+        String(date.getMonth() + 1).padStart(2, '0') + '-' +
+        String(date.getDate()).padStart(2, '0') + ' ' +
+        String(date.getHours()).padStart(2, '0') + ':' +
+        String(date.getMinutes()).padStart(2, '0');
 
     // 添加用戶位置標記
     const userLat = parseFloat(localStorage.getItem('user-lat') || '0');
