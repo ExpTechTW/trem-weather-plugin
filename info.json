@@ -1,18 +1,17 @@
 {
-    "name": "weather",
-    "version": "1.0.1",
-    "description": {
-      "zh_tw": "顯示天氣相關資訊",
-      "zh-Hant": "顯示天氣相關資訊"
-    },
-    "author": [
-      "bamboo0403"
-    ],
-    "dependencies": {
-      "trem": ">=3.1.1"
-    },
-    "resources": [
-    ],
-    "link": "https://github.com/ExpTechTW/trem-weather-plugin"
-
-  }
+  "name": "weather",
+  "version": "1.0.2",
+  "description": {
+    "zh_tw": "顯示天氣相關資訊",
+    "zh-Hant": "顯示天氣相關資訊"
+  },
+  "author": [
+    "bamboo0403"
+  ],
+  "dependencies": {
+    "trem": ">=3.1.1"
+  },
+  "resources": [
+  ],
+  "link": "https://github.com/ExpTechTW/trem-weather-plugin"
+}
