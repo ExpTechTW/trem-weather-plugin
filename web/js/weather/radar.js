@@ -1,5 +1,4 @@
 const resetButton = document.getElementById('reset-position');
-const updateButton = document.getElementById('update-position');
 
 // 創建雷達圖層控制器
 window.radarLayer = {
@@ -37,24 +36,6 @@ resetButton.addEventListener('click', () => {
         center: [120.2, 23.6],
         zoom: 6.6
     });
-});
-  
-updateButton.addEventListener('click', async () => {
-    const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
-    const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
-  
-    const timeDisplay = document.getElementById('time-display');
-    const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
-        String(date.getMonth() + 1).padStart(2, '0') + '-' +
-        String(date.getDate()).padStart(2, '0') + ' ' +
-        String(date.getHours()).padStart(2, '0') + ':' +
-        String(date.getMinutes()).padStart(2, '0');
-    
-    map.getSource('radarTiles').setTiles([
-        `https://api-1.exptech.dev/api/v1/tiles/radar/${latestTime}/{z}/{x}/{y}.png`
-    ]);
 });
   
 let opacity = 1;

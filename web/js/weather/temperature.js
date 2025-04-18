@@ -60,41 +60,6 @@ resetButton.addEventListener('click', () => {
     });
 });
 
-updateButton.addEventListener('click', async () => {
-    const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
-    const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
-
-    const timeDisplay = document.getElementById('time-display');
-    const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
-        String(date.getMonth() + 1).padStart(2, '0') + '-' +
-        String(date.getDate()).padStart(2, '0') + ' ' +
-        String(date.getHours()).padStart(2, '0') + ':' +
-        String(date.getMinutes()).padStart(2, '0');
-
-    const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${latestTime}`);
-    const weatherData = await weatherResponse.json();
-
-    const temperatureData = weatherData
-        .filter(station => station.data.air.temperature !== -99)
-        .map(station => ({
-            type: 'Feature',
-            properties: {
-                id: station.id,
-                temperature: station.data.air.temperature
-            },
-            geometry: {
-                type: 'Point',
-                coordinates: [station.station.lng, station.station.lat]
-            }
-        }));
-
-    map.getSource('temperature-data').setData({
-        type: 'FeatureCollection',
-        features: temperatureData
-    });
-});
 
 map.on('load', async function() {
     const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
