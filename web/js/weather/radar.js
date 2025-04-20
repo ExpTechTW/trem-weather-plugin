@@ -64,17 +64,18 @@ map.on('load', async function () {
         console.error('雷達圖層載入錯誤:', e.error);
     });
   
+
     map.addLayer({
         'id': 'radarLayer',
         'type': 'raster',
         'source': 'radarTiles',
         'layout': {
-            'visibility': 'visible'  // 預設顯示
+            'visibility': 'visible'
         },
         'paint': {
             'raster-opacity': 1
         }
-    });
+    }, 'county-outline');
   
     setInterval(() => {
         if (isOn) {
