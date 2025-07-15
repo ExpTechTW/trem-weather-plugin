@@ -10,39 +10,30 @@ window.lightningLayer = {
             map.setLayoutProperty('lightning-markers', 'visibility', 'none');
         }
     },
-    updateTime: async function(time) {
+    updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
         const timeListResponse = await fetch('https://api-1.exptech.dev/api/v1/meteor/lightning/list');
         const timeList = await timeListResponse.json();
-        
-        // 如果沒有提供時間參數，使用最新的時間
-        if (!time) {
-            time = timeList[timeList.length - 1];
-        }
-        
-        // 更新時間選擇器
-        const timeSelector = document.getElementById('time-selector');
-        if (timeSelector) {
-            timeSelector.innerHTML = ''; // 清空現有選項
-            timeList.forEach(t => {
-                const option = document.createElement('option');
-                option.value = t;
-                const date = new Date(parseInt(t));
-                option.textContent = date.getFullYear() + '-' + 
-                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(date.getDate()).padStart(2, '0') + ' ' +
-                    String(date.getHours()).padStart(2, '0') + ':' +
-                    String(date.getMinutes()).padStart(2, '0');
-                if (t === time) {
-                    option.selected = true;
+
+        let time = timeList[timeList.length - 1];
+
+        if (timeStr) {
+            const target = timeStr.replace(/-/g, '/');
+            const inputDate = new Date(target);
+            let minDiff = Infinity;
+            for (const t of timeList) {
+                const d = new Date(parseInt(t));
+                const diff = Math.abs(d.getTime() - inputDate.getTime());
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    time = t;
                 }
-                timeSelector.appendChild(option);
-            });
+            }
         }
 
         const timeDisplay = document.getElementById('time-display');
         const date = new Date(parseInt(time));
-        timeDisplay.textContent = date.getFullYear() + '-' + 
+        timeDisplay.textContent = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
             String(date.getHours()).padStart(2, '0') + ':' +
@@ -61,7 +52,7 @@ window.lightningLayer = {
                     const lightningTime = parseInt(lightning.time);
                     const currentTime = parseInt(time);
                     const timeDiff = currentTime - lightningTime;
-                    
+
                     let level;
                     if (timeDiff < 5 * 60 * 1000) {
                         level = 5;
@@ -92,9 +83,10 @@ window.lightningLayer = {
                 features: lightningFeatures
             });
         } catch (error) {
-            console.error(`載入閃電資料時發生錯誤: ${error.message}`);
+            console.error('閃電資料載入失敗:', error);
         }
     }
+
 };
 
 // 載入閃電圖示
@@ -103,7 +95,7 @@ map.on('load', async function() {
         'lightning-0-5', 'lightning-0-10', 'lightning-0-30', 'lightning-0-60',
         'lightning-1-5', 'lightning-1-10', 'lightning-1-30', 'lightning-1-60'
     ];
-    
+
     for (const iconName of lightningIcons) {
         const imageUrl = `js/weather/icons/${iconName}.png`;
         try {
@@ -137,7 +129,7 @@ map.on('load', async function() {
             const lightningTime = parseInt(lightning.time);
             const currentTime = parseInt(latestTime);
             const timeDiff = currentTime - lightningTime;
-            
+
             let level;
             if (timeDiff < 5 * 60 * 1000) {
                 level = 5;
@@ -192,17 +184,10 @@ map.on('load', async function() {
         }
     });
 
-    // 添加時間選擇器事件監聽器
-    const timeSelector = document.getElementById('time-selector');
-    if (timeSelector) {
-        timeSelector.addEventListener('change', function() {
-            lightningLayer.updateTime(this.value);
-        });
-    }
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
+    timeDisplay.textContent = date.getFullYear() + '-' +
         String(date.getMonth() + 1).padStart(2, '0') + '-' +
         String(date.getDate()).padStart(2, '0') + ' ' +
         String(date.getHours()).padStart(2, '0') + ':' +
@@ -211,7 +196,7 @@ map.on('load', async function() {
     // 添加用戶位置標記
     const userLat = parseFloat(localStorage.getItem('user-lat') || '0');
     const userLon = parseFloat(localStorage.getItem('user-lon') || '0');
-    
+
     if (userLat !== 0 && userLon !== 0) {
         map.addSource('user-location', {
             type: 'geojson',
@@ -259,7 +244,7 @@ map.on('load', async function() {
     // 添加圖例切換按鈕
     const legendToggle = document.getElementById('legend-toggle');
     const legend = document.getElementById('legend');
-    
+
     if (legendToggle && legend) {
         legendToggle.addEventListener('click', function() {
             if (legend.style.display === 'none') {
@@ -271,4 +256,4 @@ map.on('load', async function() {
             }
         });
     }
-}); 
+});

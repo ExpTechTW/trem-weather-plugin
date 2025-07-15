@@ -16,38 +16,34 @@ window.pressureLayer = {
             map.setLayoutProperty('pressure-labels', 'visibility', 'none');
         }
     },
-    updateTime: async function(time) {
+    updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
         const timeListResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
         const timeList = await timeListResponse.json();
-        
-        // 如果沒有提供時間參數，使用最新的時間
-        if (!time) {
-            time = timeList[timeList.length - 1];
-        }
-        
-        // 更新時間選擇器
-        const timeSelector = document.getElementById('time-selector');
-        if (timeSelector) {
-            timeSelector.innerHTML = ''; // 清空現有選項
-            timeList.forEach(t => {
-                const option = document.createElement('option');
-                option.value = t;
-                const date = new Date(parseInt(t));
-                option.textContent = date.getFullYear() + '-' + 
-                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(date.getDate()).padStart(2, '0') + ' ' +
-                    String(date.getHours()).padStart(2, '0') + ':' +
-                    String(date.getMinutes()).padStart(2, '0');
-                if (t === time) {
-                    option.selected = true;
+        let targetTime = timeList[timeList.length - 1];
+
+        if (timeStr) {
+            const target = timeStr.replace(/-/g, '/');
+            const inputDate = new Date(target);
+            let minDiff = Infinity;
+            for (const t of timeList) {
+                const d = new Date(parseInt(t));
+                const diff = Math.abs(d.getTime() - inputDate.getTime());
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    targetTime = t;
                 }
-                timeSelector.appendChild(option);
-            });
+            }
         }
 
+        // 更新時間選擇器（如有需要）
+        // const timeSelector = document.getElementById('time-selector');
+        // if (timeSelector) {
+        //     ...如需同步選單可在此處理...
+        // }
+
         const timeDisplay = document.getElementById('time-display');
-        const date = new Date(parseInt(time));
+        const date = new Date(parseInt(targetTime));
         timeDisplay.textContent = date.getFullYear() + '-' + 
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
@@ -55,7 +51,7 @@ window.pressureLayer = {
             String(date.getMinutes()).padStart(2, '0');
 
         try {
-            const pressureResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/weather/${time}`);
+            const pressureResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/weather/${targetTime}`);
             if (!pressureResponse.ok) {
                 throw new Error(`HTTP error! status: ${pressureResponse.status}`);
             }
@@ -88,9 +84,10 @@ window.pressureLayer = {
                 features: pressureFeatures
             });
         } catch (error) {
-            console.error(`載入氣壓資料時發生錯誤: ${error.message}`);
+            console.error('氣壓資料載入失敗:', error);
         }
     }
+
 };
 
 map.on('load', async function() {

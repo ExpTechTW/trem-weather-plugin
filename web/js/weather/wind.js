@@ -28,20 +28,34 @@ window.windLayer = {
             map.setLayoutProperty('wind-speed-0-labels', 'visibility', 'none');
         }
     },
-    updateTime: async function() {
+    updateTime: async function(timeStr = undefined) {
         const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
         const timeList = await response.json();
-        const latestTime = timeList[timeList.length - 1];
+        let targetTime = timeList[timeList.length - 1];
+
+        if (timeStr) {
+            const target = timeStr.replace(/-/g, '/');
+            const inputDate = new Date(target);
+            let minDiff = Infinity;
+            for (const t of timeList) {
+                const d = new Date(parseInt(t));
+                const diff = Math.abs(d.getTime() - inputDate.getTime());
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    targetTime = t;
+                }
+            }
+        }
 
         const timeDisplay = document.getElementById('time-display');
-        const date = new Date(parseInt(latestTime));
+        const date = new Date(parseInt(targetTime));
         timeDisplay.textContent = date.getFullYear() + '-' + 
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
             String(date.getHours()).padStart(2, '0') + ':' +
             String(date.getMinutes()).padStart(2, '0');
 
-        const windResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${latestTime}`);
+        const windResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${targetTime}`);
         const windData = await windResponse.json();
 
         const windFeatures = windData

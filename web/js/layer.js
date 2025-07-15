@@ -110,13 +110,13 @@ class LayerMenu {
             item.addEventListener('click', () => {
                 const layer = item.dataset.layer;
                 this.switchLayer(layer);
-                
+
                 layerItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
-                
+
                 display.classList.remove('active');
                 menu.classList.remove('active');
-                
+
                 localStorage.setItem('activeLayer', layer);
             });
         });
@@ -137,6 +137,14 @@ class LayerMenu {
         Object.values(layers).forEach(layer => {
             if (layer) layer.hide();
         });
+
+        // 顯示/隱藏播放功能
+        const playBtn = document.getElementById('radar-play-btn');
+        const speedSel = document.getElementById('radar-speed-sel');
+        const rangeSel = document.getElementById('radar-range-sel');
+        if (playBtn) playBtn.style.display = (layer === 'radar') ? '' : 'none';
+        if (speedSel) speedSel.style.display = (layer === 'radar') ? '' : 'none';
+        if (rangeSel) rangeSel.style.display = (layer === 'radar') ? '' : 'none';
 
         // 顯示選定的圖層
         if (layers[layer]) {
@@ -159,4 +167,35 @@ class LayerMenu {
 
 window.addEventListener('DOMContentLoaded', () => {
     window.layerMenu = new LayerMenu();
-}); 
+
+    // 監聽 timeSelector 變更，呼叫對應 activeLayer 的 updateTime
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.id === 'time-selector') {
+            const val = e.target.value;
+            if (!val) return;
+            // yyyy-mm-ddThh:mm 轉 yyyy-mm-dd hh:mm
+            const timeStr = val.replace('T', ' ');
+            const activeLayer = window.layerMenu && window.layerMenu.activeLayer;
+            // interval 可根據 UI 需求取得，這裡預設為 'now'，可擴充
+            let interval = 'now';
+            // 例如可從某個 interval selector 取得值
+            // const intervalSelector = document.getElementById('interval-selector');
+            // if (intervalSelector) interval = intervalSelector.value;
+            const layerMap = {
+                radar: window.radarLayer,
+                rain: {
+                    updateTime: (time) => window.rainLayer.updateTime(interval, time)
+                },
+                temperature: window.temperatureLayer,
+                humidity: window.humidityLayer,
+                pressure: window.pressureLayer,
+                wind: window.windLayer,
+                lightning: window.lightningLayer
+            };
+            const layerObj = layerMap[activeLayer];
+            if (layerObj && typeof layerObj.updateTime === 'function') {
+                layerObj.updateTime(timeStr);
+            }
+        }
+    });
+});
