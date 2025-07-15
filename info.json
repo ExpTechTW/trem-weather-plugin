@@ -1,12 +1,12 @@
 {
   "name": "weather",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": {
     "zh_tw": "顯示天氣相關資訊",
     "zh-Hant": "顯示天氣相關資訊"
   },
   "author": [
-    "bamboo0403"
+    "bamboo0403","yayacat"
   ],
   "dependencies": {
     "trem": ">=3.1.1"
