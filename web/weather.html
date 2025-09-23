@@ -9,6 +9,7 @@
     <link href="./css/radar.css" rel="stylesheet">
     <link href="./css/color.css" rel="stylesheet">
     <link href="./css/layer.css" rel="stylesheet">
+    <link href="./css/time-selector.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,63 +40,13 @@
     <script src="./js/map.js"></script>
     <script src="./js/layer.js"></script>
     <script src="./js/weather/radar.js"></script>
+    <script src="./js/weather/radarRain.js"></script>
     <script src="./js/weather/rain.js"></script>
     <script src="./js/weather/temperature.js"></script>
     <script src="./js/weather/humidity.js"></script>
     <script src="./js/weather/pressure.js"></script>
     <script src="./js/weather/wind.js"></script>
     <script src="./js/weather/lightning.js"></script>
-    <script>
-    // 動態插入 time-selector，並用 absolute 定位於 time-display 右側
-    const timeDisplay = document.getElementById('time-display');
-    let timeSelector = null;
-    timeDisplay.addEventListener('click', function() {
-        if (!timeSelector) {
-            timeSelector = document.createElement('input');
-            timeSelector.type = 'datetime-local';
-            timeSelector.id = 'time-selector';
-            timeSelector.style.height = '28px';
-            timeSelector.style.fontSize = '1rem';
-            timeSelector.style.position = 'absolute';
-            timeSelector.style.zIndex = '1001';
-            // 深色模式樣式
-            timeSelector.style.background = '#232323';
-            timeSelector.style.color = '#fff';
-            timeSelector.style.border = '1px solid #444';
-            timeSelector.style.borderRadius = '6px';
-            timeSelector.style.boxShadow = '0 2px 8px #0008';
-            timeSelector.style.padding = '0 8px';
-            timeSelector.style.outline = 'none';
-            timeSelector.addEventListener('blur', function() {
-                setTimeout(() => {
-                    if (timeSelector && timeSelector.parentNode) {
-                        timeSelector.parentNode.removeChild(timeSelector);
-                    }
-                }, 200);
-            });
-        }
-        // 若 time-display 有值，帶入 timeSelector
-        if (timeDisplay.textContent) {
-            // 解析 yyyy-mm-dd hh:mm
-            const match = timeDisplay.textContent.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/);
-            if (match) {
-                const val = `${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}`;
-                timeSelector.value = val;
-            }
-        } else {
-            timeSelector.value = '';
-        }
-        // 取得 time-display 的座標，將 time-selector 貼齊右側
-        const rect = timeDisplay.getBoundingClientRect();
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        timeSelector.style.left = (rect.right + scrollLeft + 8) + 'px';
-        timeSelector.style.top = (rect.top + scrollTop) + 'px';
-        if (!timeSelector.parentNode) {
-            document.body.appendChild(timeSelector);
-            timeSelector.focus();
-        }
-    });
-    </script>
+    <script src="./js/time-selector.js" defer></script>
 </body>
 </html>

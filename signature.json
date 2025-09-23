@@ -1,15 +1,17 @@
 {
-  "timestamp": 1752332254757,
-  "version": "1.1.0",
+  "timestamp": 1758588780839,
+  "version": "1.2.0",
   "fileHashes": {
     "index.js": "85fe541d2d9f2c7dc22fcfb7922fce7683107b8104d2b4caeb03c97511a94946",
-    "info.json": "dd43a7c65d881104e9aa1ecda8d3766a6e705ab5582da681de6ac7e53c02b627",
+    "info.json": "9f43e7b328f121f3719f3acce74bfe55166e08d2affbfa03e653c9ffa2ff08e5",
     "web/css/color.css": "576e37a735999274264364b44f5d37698e8b7eced1779a5346e3809aca9d2239",
     "web/css/layer.css": "7b2102628a82cc297d9e2cbac8f2e474f17b95c34603fe5cc4cb4c68f2a38def",
     "web/css/radar.css": "d8c95abbb0d2dd96b6d641d52666d521cf6e1957ea1e116ca6b6dbf5577e1d77",
-    "web/js/layer.js": "f67b139343743793f08ea48e81ae86deb24fdc658cc7a0704e19dc9828b6a458",
+    "web/css/time-selector.css": "4c81c6bfc9dd32ff92c8c21bee073f75b2db52a0742f9645260b6a391e784c67",
+    "web/js/layer.js": "91c0bc6eb2875e25f9cc776439b214bf1d252fc3e9c3b84d450b8c806a57a1e1",
     "web/js/map.js": "a4059f6ea639bea8dee84950cbc4b1a36a1f7c853e105966d3611c303f54bf15",
     "web/js/nav.js": "c873f6ce194f4d6a2a4ceef31a9bd8ab3192f1d28544dcbe916d3163184bba69",
+    "web/js/time-selector.js": "5b7fd0f347dc7c02ca80d21132855f77c05eb256a1e5d91cf6c55a2c9f7a4f56",
     "web/js/weather/humidity.js": "fc32c0b25d9e154e1c7c552b171c239e58046c586d5f88281f5890ce2e307233",
     "web/js/weather/icons/lightning-0-10.png": "fd5cd9add4bd2b5b10a29f508bad06ed7f8648ef4e3051f407e22dce108680d2",
     "web/js/weather/icons/lightning-0-30.png": "6a27cc99320ede520b7d50b97d5e3a628178e21ffe99722ff10fd9ec59b59c7f",
@@ -27,11 +29,12 @@
     "web/js/weather/lightning.js": "85b7b51ed8ee4c9e5a4ead46568a48cbd24ddb0ab671455fe4547f2063316884",
     "web/js/weather/pressure.js": "eab312f6d1577a50f8352858fb50f4d7f5926dd5a2f1812ec5bc85f02a8fd70e",
     "web/js/weather/radar.js": "7cb31124f063c45a2d2deafc4e9cd53e95e88b75712c80a195a0c5aeccbf35e9",
+    "web/js/weather/radarRain.js": "2368ca73f354aab2345c913bdda9d4c61e78582a284b96821b5d0902214f0bec",
     "web/js/weather/rain.js": "18360b048ab42a34a498968137fead8290f6a687cd85c104c2d6ea7c206efe11",
     "web/js/weather/temperature.js": "c0b3e681458e480abf0a4d70c24c19e3132dab57cdb62cd88e31ad1219264e87",
     "web/js/weather/wind.js": "1a73789154606deb4f12e160ed6c1dd4f5f0536790170c77884f37c2080ba7a3",
-    "web/weather.html": "9428b103cd6eb9ca0fae83bbab5f6120e43f661e3194faa499bdf1e9ab6772b4"
+    "web/weather.html": "f6d9c2a680a96945dc508f24d71ce9a1440b99306894d0a32f9ab740f041b8d1"
   },
-  "signature": "DxPGaxxqugc8SHg9XZvherIuTDduw7T6qK6hAjqs1vvpkd+/US5C/yys/HMlpkNF9iw87+hzDudWAooFmbUMIZiPxdSEgSZMJYFc/q4rcyaA/m77MYmG9/8d53QPq0YoKc5t9o9Pi2A0GcBgovtyrTTawBOIU5V24SDWNU0vBqo9HjzOt3C4wbG+vAbibFHBbparT6J3IsdCQAz3e9kYw6K6ahyTEMfOMxpLpDEVQg2f5P4pYXMe77hhVKoaeQkOSaKMGsqxt1OcbNd6sxNInPIUm/FizdP+xL3iqFJ/NwmO4vV57AX+cyyhfxJ4oscPDTopfGqn6IANHY8s8Scihg==",
+  "signature": "RP3DJwxewnbwG2exSPZ/CQ1ZmF3kEVeDAtCXnlepdynpSK8I5WYIIUI2I/em+fuQib3CGhWMKoMoXoLB9pbzFeS3Snu5EXakouThsv1D5xZEY93DI18AKwYibWTAFQz9bOwChaEm/yfPHN33K7r5zwHryvWWSj4GNaClCHPaWVjgiYhJn9p8Il+MA261nW3Ur295an8Jqtxl2qcRrYvoMR3EEG5nahjOgPAVn3HVI/HpoHY0EmXEz1nooZZp5nEnnuUCNj1nf5LvVq6rh28wJjItzQQJQd+Cx/JHDjI+D7HRiunQVha5X47Tmojf3qLqQPxucy+U5pUVauL8QxA75g==",
   "keyId": "official"
 }
