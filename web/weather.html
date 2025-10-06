@@ -10,9 +10,11 @@
     <link href="./css/color.css" rel="stylesheet">
     <link href="./css/layer.css" rel="stylesheet">
     <link href="./css/time-selector.css" rel="stylesheet">
+    <link href="./css/chart.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./js/nav.js" defer></script>
 </head>
 
@@ -37,6 +39,21 @@
         </svg>
     </button>
 
+    <div id="chart-popup" class="chart-popup">
+        <div class="chart-popup-content">
+            <span class="chart-close-button">&times;</span>
+            <div id="progress-container" style="display: none; width: 100%; background-color: #ddd;">
+                <div id="progress-bar" style="width: 0%; height: 20px; background-color: #4CAF50; text-align: center; line-height: 20px; color: white;">0%</div>
+            </div>
+            <canvas id="temperature-chart"></canvas>
+            <canvas id="wind-chart"></canvas>
+            <canvas id="rain-chart"></canvas>
+            <canvas id="humidity-chart"></canvas>
+            <canvas id="pressure-chart"></canvas>
+        </div>
+    </div>
+
+    <script src="./js/globals.js"></script>
     <script src="./js/map.js"></script>
     <script src="./js/layer.js"></script>
     <script src="./js/weather/radar.js"></script>

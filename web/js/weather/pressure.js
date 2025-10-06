@@ -67,7 +67,7 @@ window.pressureLayer = {
                         properties: {
                             id: station.id,
                             pressure: pressure,
-                            stationName: station.station.name,
+                            name: station.station.name,
                             county: station.station.county,
                             town: station.station.town
                         },
@@ -116,7 +116,7 @@ map.on('load', async function() {
                 properties: {
                     id: station.id,
                     pressure: pressure,
-                    stationName: station.station.name,
+                    name: station.station.name,
                     county: station.station.county,
                     town: station.station.town
                 },
@@ -176,6 +176,12 @@ map.on('load', async function() {
         layout: {
             'visibility': 'none',
             'text-field': ['get', 'pressure'],
+            'text-field': ['format',
+                ['get', 'name'],
+                '\n',
+                ['get', 'pressure'],
+                ' (hPa)'
+            ],
             'text-size': 12,
             'text-font': ['Noto Sans Regular'],
             'text-offset': [0, 2]
@@ -188,9 +194,128 @@ map.on('load', async function() {
         minzoom: 8.5
     });
 
-    map.on('click', 'pressure-circles', (e) => {
+    map.on('click', 'pressure-circles', async (e) => {
         const stationId = e.features[0].properties.id;
-        // 這裡可以添加點擊事件處理，例如顯示詳細信息
-        console.log('Selected station:', stationId);
+        const stationName = e.features[0].properties.name;
+
+        // 顯示 popup 與進度
+        chartPopup.style.display = 'block';
+        progressContainer.style.display = 'block';
+        tempChartCanvas.style.display = 'none';
+        windChartCanvas.style.display = 'none';
+        rainChartCanvas.style.display = 'none';
+        humidityChartCanvas.style.display = 'none';
+        pressureChartCanvas.style.display = 'none';
+
+        if (window.temperatureChart) {
+            window.temperatureChart.destroy();
+        }
+        if (window.windChart) {
+            window.windChart.destroy();
+        }
+        if (window.pressureChart) {
+            window.pressureChart.destroy();
+        }
+
+        const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+        const timeList = await listResponse.json();
+
+        const historyData = [];
+        let loadedCount = 0;
+
+        for (const time of timeList) {
+            let weatherData;
+            if (weatherCache.has(time)) {
+                weatherData = weatherCache.get(time);
+            } else {
+                const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
+                weatherData = await weatherResponse.json();
+                weatherCache.set(time, weatherData);
+            }
+
+            const stationData = weatherData.find(s => s.id === stationId);
+            if (stationData && stationData.data.air.pressure !== -99) {
+                historyData.push({
+                    time: parseInt(time),
+                    data: stationData.data
+                });
+            }
+
+            loadedCount++;
+            const progress = Math.round((loadedCount / timeList.length) * 100);
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+        }
+
+        // 隱藏進度並顯示壓力圖
+        progressContainer.style.display = 'none';
+        tempChartCanvas.style.display = 'none';
+        windChartCanvas.style.display = 'none';
+        rainChartCanvas.style.display = 'none';
+        humidityChartCanvas.style.display = 'none';
+        pressureChartCanvas.style.display = 'block';
+
+        historyData.sort((a, b) => a.time - b.time);
+
+        const labels = historyData.map(d => {
+            const date = new Date(d.time);
+            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        });
+        const pressures = historyData.map(d => d.data.air.pressure);
+
+        const textColor = '#f1f1f1';
+        const gridColor = 'rgba(255, 255, 255, 0.1)';
+
+        window.pressureChart = new Chart(pressureChartCanvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '氣壓',
+                    data: pressures,
+                    borderColor: 'rgba(54,162,235,1)',
+                    backgroundColor: 'rgba(54,162,235,0.2)',
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `測站 ${stationName} 過去氣壓變化`,
+                        color: textColor,
+                        font: { size: 18 }
+                    },
+                    legend: {
+                        labels: { color: textColor }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: { display: true, text: '時間', color: textColor },
+                        ticks: { color: textColor },
+                        grid: { color: gridColor }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: '氣壓 (hPa)', color: textColor },
+                        ticks: { color: textColor },
+                        grid: { color: gridColor }
+                    }
+                }
+            }
+        });
+
+        closeButton.onclick = function() {
+            chartPopup.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == chartPopup) {
+                chartPopup.style.display = 'none';
+            }
+        }
     });
-}); 
+});
