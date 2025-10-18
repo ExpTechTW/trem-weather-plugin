@@ -10,3 +10,6 @@ const pressureChartCanvas = document.getElementById('pressure-chart');
 const closeButton = document.querySelector('.chart-close-button');
 const progressContainer = document.getElementById('progress-container');
 const progressBar = document.getElementById('progress-bar');
+
+let isLoading = false;
+let shouldStopLoading = false;

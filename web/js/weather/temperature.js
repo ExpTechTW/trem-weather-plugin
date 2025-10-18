@@ -193,6 +193,10 @@ map.on('load', async function() {
         const stationId = e.features[0].properties.id;
         const stationName = e.features[0].properties.name;
 
+        // Reset loading flags
+        shouldStopLoading = false;
+        isLoading = true;
+
         // Show popup and progress bar
         chartPopup.style.display = 'block';
         progressContainer.style.display = 'block';
@@ -202,11 +206,36 @@ map.on('load', async function() {
         humidityChartCanvas.style.display = 'none';
         pressureChartCanvas.style.display = 'none';
 
+        if (window.humidityChart) {
+            window.humidityChart.destroy();
+        }
+        if (window.pressureChart) {
+            window.pressureChart.destroy();
+        }
+        if (window.rainChart) {
+            window.rainChart.destroy();
+        }
         if (window.temperatureChart) {
             window.temperatureChart.destroy();
         }
         if (window.windChart) {
             window.windChart.destroy();
+        }
+
+        closeButton.onclick = function() {
+            if (isLoading) {
+                shouldStopLoading = true;
+            }
+            chartPopup.style.display = 'none';
+            if (window.temperatureChart) {
+                window.temperatureChart.destroy();
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == chartPopup) {
+                chartPopup.style.display = 'none';
+            }
         }
 
         const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
@@ -237,6 +266,17 @@ map.on('load', async function() {
             const progress = Math.round((loadedCount / timeList.length) * 100);
             progressBar.style.width = progress + '%';
             progressBar.textContent = progress + '%';
+
+            if (shouldStopLoading) {
+                isLoading = false;
+                return;
+            }
+        }
+
+        isLoading = false;
+
+        if (shouldStopLoading) {
+            return;
         }
 
         // Hide progress bar and show chart
@@ -319,15 +359,5 @@ map.on('load', async function() {
                 }
             }
         });
-
-        closeButton.onclick = function() {
-            chartPopup.style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == chartPopup) {
-                chartPopup.style.display = 'none';
-            }
-        }
     });
 });
