@@ -79,6 +79,28 @@
     z-index: 1;
 }
 
+.chart-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#chart-duration-select {
+    background: #2c2c2c;
+    color: #f1f1f1;
+    border: 1px solid #555;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+
+#chart-type-select {
+    background: #2c2c2c;
+    color: #f1f1f1;
+    border: 1px solid #555;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+
 #progress-bar {
     width: 0%;
     height: 20px;

@@ -39,11 +39,28 @@
         </svg>
     </button>
 
-    <div id="chart-popup" class="chart-popup">
+    <div id="chart-popup" class="chart-popup" data-station-id="" data-station-name="">
         <div class="chart-popup-content">
             <div class="chart-header">
-                <h3 id="chart-title">載入中…</h3>
-                <span class="chart-close-button" aria-label="關閉">&times;</span>
+                <div class="chart-header-left">
+                    <h3 id="chart-title">載入中…</h3>
+                </div>
+                <div class="chart-header-right">
+                    <select id="chart-type-select" aria-label="切換圖表">
+                        <option value="temperature" selected>氣溫</option>
+                        <option value="wind">風向/風速</option>
+                        <option value="rain">雨量</option>
+                        <option value="humidity">濕度</option>
+                        <option value="pressure">氣壓</option>
+                    </select>
+                    <select id="chart-duration-select" aria-label="選擇時長">
+                        <option value="6">6 小時</option>
+                        <option value="12">12 小時</option>
+                        <option value="24">24 小時</option>
+                        <option value="all" selected>全部</option>
+                    </select>
+                    <span class="chart-close-button" aria-label="關閉">&times;</span>
+                </div>
             </div>
             <div id="progress-container">
                 <div id="progress-bar">0%</div>

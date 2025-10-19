@@ -44,7 +44,7 @@ window.humidityLayer = {
 
         const timeDisplay = document.getElementById('time-display');
         const date = new Date(parseInt(targetTime));
-        timeDisplay.textContent = date.getFullYear() + '-' + 
+        timeDisplay.textContent = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
             String(date.getHours()).padStart(2, '0') + ':' +
@@ -90,6 +90,157 @@ window.humidityLayer = {
 
 };
 
+const showHumidityChart = async (e) => {
+    const stationId = e.features[0].properties.id;
+    const stationName = e.features[0].properties.name;
+
+    window.initchartPopup();
+    chartPopup.dataset.stationId = stationId;
+    chartPopup.dataset.stationName = stationName;
+    setChartTitle(stationName + ' - 濕度');
+    chartTypeSelect.value = 'humidity';
+
+    closeButton.onclick = function() {
+        if (isLoading) {
+            shouldStopLoading = true;
+        }
+        chartPopup.style.display = 'none';
+        if (window.humidityChart) {
+            window.humidityChart.destroy();
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == chartPopup) {
+            chartPopup.style.display = 'none';
+        }
+    }
+
+    const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const timeList = await listResponse.json();
+    const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
+
+    const historyData = [];
+    let loadedCount = 0;
+
+    for (const time of filteredTimeList) {
+        let weatherData;
+        if (weatherCache.has(time)) {
+            weatherData = weatherCache.get(time);
+        } else {
+            const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
+            weatherData = await weatherResponse.json();
+            weatherCache.set(time, weatherData);
+        }
+
+        const stationData = weatherData.find(s => s.id === stationId);
+        if (stationData && stationData.data.air.relative_humidity !== -99) {
+            historyData.push({
+                time: parseInt(time),
+                data: stationData.data
+            });
+        }
+
+        loadedCount++;
+        const progress = Math.round((loadedCount / timeList.length) * 100);
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = progress + '%';
+
+        if (shouldStopLoading) {
+            isLoading = false;
+            return;
+        }
+    }
+
+    isLoading = false;
+
+    if (shouldStopLoading) {
+        return;
+    }
+
+    // Hide progress bar and show chart
+    progressContainer.style.display = 'none';
+    tempChartCanvas.style.display = 'none';
+    windChartCanvas.style.display = 'none';
+    rainChartCanvas.style.display = 'none';
+    pressureChartCanvas.style.display = 'none';
+    humidityChartCanvas.style.display = 'block';
+
+    historyData.sort((a, b) => a.time - b.time);
+
+    const labels = historyData.map(d => {
+        const date = new Date(d.time);
+        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    });
+    const humidityData = historyData.map(d => d.data.air.relative_humidity);
+
+    const textColor = '#f1f1f1';
+    const gridColor = 'rgba(255, 255, 255, 0.1)';
+
+    window.humidityChart = new Chart(humidityChartCanvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '濕度',
+                data: humidityData,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `測站 ${stationName} 過去濕度變化`,
+                    color: textColor,
+                    font: {
+                        size: 18
+                    }
+                },
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '時間',
+                        color: textColor
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '濕度 (%)',
+                        color: textColor
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            }
+        }
+    });
+};
+window.showHumidityChart = showHumidityChart;
+
 map.on('load', async function() {
     const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
     const timeList = await response.json();
@@ -97,7 +248,7 @@ map.on('load', async function() {
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
+    timeDisplay.textContent = date.getFullYear() + '-' +
         String(date.getMonth() + 1).padStart(2, '0') + '-' +
         String(date.getDate()).padStart(2, '0') + ' ' +
         String(date.getHours()).padStart(2, '0') + ':' +
@@ -192,176 +343,5 @@ map.on('load', async function() {
         minzoom: 8.5
     });
 
-    map.on('click', 'humidity-circles', async (e) => {
-        const stationId = e.features[0].properties.id;
-        const stationName = e.features[0].properties.name;
-
-        // Reset loading flags
-        shouldStopLoading = false;
-        isLoading = true;
-
-        // Show popup and progress bar
-    chartPopup.style.display = 'block';
-    setChartTitle(stationName + ' - 濕度');
-    progressContainer.style.display = 'block';
-        tempChartCanvas.style.display = 'none';
-        windChartCanvas.style.display = 'none';
-        rainChartCanvas.style.display = 'none';
-        humidityChartCanvas.style.display = 'none';
-        pressureChartCanvas.style.display = 'none';
-
-        if (window.humidityChart) {
-            window.humidityChart.destroy();
-        }
-        if (window.pressureChart) {
-            window.pressureChart.destroy();
-        }
-        if (window.rainChart) {
-            window.rainChart.destroy();
-        }
-        if (window.temperatureChart) {
-            window.temperatureChart.destroy();
-        }
-        if (window.windChart) {
-            window.windChart.destroy();
-        }
-
-        closeButton.onclick = function() {
-            if (isLoading) {
-                shouldStopLoading = true;
-            }
-            chartPopup.style.display = 'none';
-            if (window.humidityChart) {
-                window.humidityChart.destroy();
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == chartPopup) {
-                chartPopup.style.display = 'none';
-            }
-        }
-
-        const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
-        const timeList = await listResponse.json();
-
-        const historyData = [];
-        let loadedCount = 0;
-
-        for (const time of timeList) {
-            let weatherData;
-            if (weatherCache.has(time)) {
-                weatherData = weatherCache.get(time);
-            } else {
-                const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
-                weatherData = await weatherResponse.json();
-                weatherCache.set(time, weatherData);
-            }
-
-            const stationData = weatherData.find(s => s.id === stationId);
-            if (stationData && stationData.data.air.relative_humidity !== -99) {
-                historyData.push({
-                    time: parseInt(time),
-                    data: stationData.data
-                });
-            }
-
-            loadedCount++;
-            const progress = Math.round((loadedCount / timeList.length) * 100);
-            progressBar.style.width = progress + '%';
-            progressBar.textContent = progress + '%';
-
-            if (shouldStopLoading) {
-                isLoading = false;
-                return;
-            }
-        }
-
-        isLoading = false;
-
-        if (shouldStopLoading) {
-            return;
-        }
-
-        // Hide progress bar and show chart
-        progressContainer.style.display = 'none';
-        tempChartCanvas.style.display = 'none';
-        windChartCanvas.style.display = 'none';
-        rainChartCanvas.style.display = 'none';
-        pressureChartCanvas.style.display = 'none';
-        humidityChartCanvas.style.display = 'block';
-
-        historyData.sort((a, b) => a.time - b.time);
-
-        const labels = historyData.map(d => {
-            const date = new Date(d.time);
-            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-        });
-        const humidityData = historyData.map(d => d.data.air.relative_humidity);
-
-        const textColor = '#f1f1f1';
-        const gridColor = 'rgba(255, 255, 255, 0.1)';
-
-        window.humidityChart = new Chart(humidityChartCanvas, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '濕度',
-                    data: humidityData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `測站 ${stationName} 過去濕度變化`,
-                        color: textColor,
-                        font: {
-                            size: 18
-                        }
-                    },
-                    legend: {
-                        labels: {
-                            color: textColor
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '時間',
-                            color: textColor
-                        },
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '濕度 (%)',
-                            color: textColor
-                        },
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor
-                        }
-                    }
-                }
-            }
-        });
-    });
+    map.on('click', 'humidity-circles', showHumidityChart);
 });

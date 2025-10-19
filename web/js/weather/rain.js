@@ -119,6 +119,158 @@ window.rainLayer = {
     }
 };
 
+const showRainChart = async (e) => {
+    const stationId = e.features[0].properties.id;
+    const stationName = e.features[0].properties.name;
+
+    window.initchartPopup();
+    chartPopup.dataset.stationId = stationId;
+    chartPopup.dataset.stationName = stationName;
+    setChartTitle(stationName + ' - 雨量');
+    chartTypeSelect.value = 'rain';
+
+    closeButton.onclick = function() {
+        if (isLoading) {
+            shouldStopLoading = true;
+        }
+        chartPopup.style.display = 'none';
+        if (window.rainChart) {
+            window.rainChart.destroy();
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == chartPopup) {
+            chartPopup.style.display = 'none';
+        }
+    }
+
+const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/rain/list');
+const timeList = await listResponse.json();
+const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
+
+    const historyData = [];
+    let loadedCount = 0;
+
+for (const time of filteredTimeList) {
+        let weatherData;
+        if (rainCache.has(time)) {
+            weatherData = rainCache.get(time);
+        } else {
+            const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/rain/${time}`);
+            weatherData = await weatherResponse.json();
+            rainCache.set(time, weatherData);
+        }
+
+        const stationData = weatherData.find(s => s.id === stationId);
+        if (stationData && stationData.data.now !== -99) {
+            historyData.push({
+                time: parseInt(time),
+                data: stationData.data
+            });
+        }
+
+        loadedCount++;
+        const progress = Math.round((loadedCount / timeList.length) * 100);
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = progress + '%';
+
+        if (shouldStopLoading) {
+            isLoading = false;
+            return;
+        }
+    }
+
+    isLoading = false;
+
+    if (shouldStopLoading) {
+        return;
+    }
+
+    // Hide progress bar and show chart
+    progressContainer.style.display = 'none';
+    tempChartCanvas.style.display = 'none';
+    windChartCanvas.style.display = 'none';
+    rainChartCanvas.style.display = 'none';
+    humidityChartCanvas.style.display = 'none';
+    pressureChartCanvas.style.display = 'none';
+    rainChartCanvas.style.display = 'block';
+
+    historyData.sort((a, b) => a.time - b.time);
+
+    const labels = historyData.map(d => {
+        const date = new Date(d.time);
+        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    });
+    const rainfalls = historyData.map(d => d.data.now);
+
+    const textColor = '#f1f1f1';
+    const gridColor = 'rgba(255, 255, 255, 0.1)';
+
+    window.rainChart = new Chart(rainChartCanvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '雨量',
+                data: rainfalls,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `測站 ${stationName} 過去雨量變化`,
+                    color: textColor,
+                    font: {
+                        size: 18
+                    }
+                },
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '時間',
+                        color: textColor
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: '雨量 (mm)',
+                        color: textColor
+                    },
+                    ticks: {
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            }
+        }
+    });
+};
+window.showRainChart = showRainChart;
+
 map.on('load', async function() {
     const response = await fetch('https://api.exptech.dev/api/v1/meteor/rain/list');
     const timeList = await response.json();
@@ -279,180 +431,6 @@ map.on('load', async function() {
         filter: ['!=', ['get', 'rainfall'], 0],
         minzoom: 8.5
     });
-
-    const showRainChart = async (e) => {
-        const stationId = e.features[0].properties.id;
-        const stationName = e.features[0].properties.name;
-
-        // Reset loading flags
-        shouldStopLoading = false;
-        isLoading = true;
-
-        // Show popup and progress bar
-    chartPopup.style.display = 'block';
-    setChartTitle(stationName + ' - 雨量');
-    progressContainer.style.display = 'block';
-        tempChartCanvas.style.display = 'none';
-        windChartCanvas.style.display = 'none';
-        rainChartCanvas.style.display = 'none';
-        humidityChartCanvas.style.display = 'none';
-        pressureChartCanvas.style.display = 'none';
-
-        if (window.humidityChart) {
-            window.humidityChart.destroy();
-        }
-        if (window.pressureChart) {
-            window.pressureChart.destroy();
-        }
-        if (window.rainChart) {
-            window.rainChart.destroy();
-        }
-        if (window.temperatureChart) {
-            window.temperatureChart.destroy();
-        }
-        if (window.windChart) {
-            window.windChart.destroy();
-        }
-
-        closeButton.onclick = function() {
-            if (isLoading) {
-                shouldStopLoading = true;
-            }
-            chartPopup.style.display = 'none';
-            if (window.rainChart) {
-                window.rainChart.destroy();
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == chartPopup) {
-                chartPopup.style.display = 'none';
-            }
-        }
-
-        const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/rain/list');
-        const timeList = await listResponse.json();
-
-        const historyData = [];
-        let loadedCount = 0;
-
-        for (const time of timeList) {
-            let weatherData;
-            if (rainCache.has(time)) {
-                weatherData = rainCache.get(time);
-            } else {
-                const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/rain/${time}`);
-                weatherData = await weatherResponse.json();
-                rainCache.set(time, weatherData);
-            }
-
-            const stationData = weatherData.find(s => s.id === stationId);
-            if (stationData && stationData.data.now !== -99) {
-                historyData.push({
-                    time: parseInt(time),
-                    data: stationData.data
-                });
-            }
-
-            loadedCount++;
-            const progress = Math.round((loadedCount / timeList.length) * 100);
-            progressBar.style.width = progress + '%';
-            progressBar.textContent = progress + '%';
-
-            if (shouldStopLoading) {
-                isLoading = false;
-                return;
-            }
-        }
-
-        isLoading = false;
-
-        if (shouldStopLoading) {
-            return;
-        }
-
-        // Hide progress bar and show chart
-        progressContainer.style.display = 'none';
-        tempChartCanvas.style.display = 'none';
-        windChartCanvas.style.display = 'none';
-        rainChartCanvas.style.display = 'none';
-        humidityChartCanvas.style.display = 'none';
-        pressureChartCanvas.style.display = 'none';
-        rainChartCanvas.style.display = 'block';
-
-        historyData.sort((a, b) => a.time - b.time);
-
-        const labels = historyData.map(d => {
-            const date = new Date(d.time);
-            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-        });
-        const rainfalls = historyData.map(d => d.data.now);
-
-        const textColor = '#f1f1f1';
-        const gridColor = 'rgba(255, 255, 255, 0.1)';
-
-        window.rainChart = new Chart(rainChartCanvas, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '雨量',
-                    data: rainfalls,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `測站 ${stationName} 過去雨量變化`,
-                        color: textColor,
-                        font: {
-                            size: 18
-                        }
-                    },
-                    legend: {
-                        labels: {
-                            color: textColor
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '時間',
-                            color: textColor
-                        },
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '雨量 (mm)',
-                            color: textColor
-                        },
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor
-                        }
-                    }
-                }
-            }
-        });
-    };
 
     map.on('click', 'rain-circles', showRainChart);
     map.on('click', 'rain-0-circles', showRainChart);
