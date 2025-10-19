@@ -49,7 +49,7 @@ window.windLayer = {
 
         const timeDisplay = document.getElementById('time-display');
         const date = new Date(parseInt(targetTime));
-        timeDisplay.textContent = date.getFullYear() + '-' + 
+        timeDisplay.textContent = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
             String(date.getHours()).padStart(2, '0') + ':' +
@@ -165,6 +165,7 @@ const showWindChart = async (e) => {
     humidityChartCanvas.style.display = 'none';
     pressureChartCanvas.style.display = 'none';
     windChartCanvas.style.display = 'block';
+    allChartCanvas.style.display = 'none';
 
     historyData.sort((a, b) => a.time - b.time);
 
@@ -271,7 +272,7 @@ map.on('load', async function() {
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
+    timeDisplay.textContent = date.getFullYear() + '-' +
         String(date.getMonth() + 1).padStart(2, '0') + '-' +
         String(date.getDate()).padStart(2, '0') + ' ' +
         String(date.getHours()).padStart(2, '0') + ':' +

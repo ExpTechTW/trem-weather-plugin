@@ -52,6 +52,7 @@
                         <option value="rain">雨量</option>
                         <option value="humidity">濕度</option>
                         <option value="pressure">氣壓</option>
+                        <option value="all">全部</option>
                     </select>
                     <select id="chart-duration-select" aria-label="選擇時長">
                         <option value="6">6 小時</option>
@@ -70,6 +71,7 @@
             <canvas id="rain-chart"></canvas>
             <canvas id="humidity-chart"></canvas>
             <canvas id="pressure-chart"></canvas>
+            <canvas id="all-chart"></canvas>
         </div>
     </div>
 
@@ -85,5 +87,6 @@
     <script src="./js/weather/wind.js"></script>
     <script src="./js/weather/lightning.js"></script>
     <script src="./js/time-selector.js" defer></script>
+    <script src="./js/weather/allchart.js" defer></script>
 </body>
 </html>

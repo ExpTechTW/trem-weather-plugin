@@ -49,7 +49,7 @@ window.rainLayer = {
 
         const timeDisplay = document.getElementById('time-display');
         const date = new Date(parseInt(targetTime));
-        timeDisplay.textContent = date.getFullYear() + '-' + 
+        timeDisplay.textContent = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
             String(date.getHours()).padStart(2, '0') + ':' +
@@ -145,14 +145,14 @@ const showRainChart = async (e) => {
         }
     }
 
-const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/rain/list');
-const timeList = await listResponse.json();
-const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
+    const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/rain/list');
+    const timeList = await listResponse.json();
+    const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
 
     const historyData = [];
     let loadedCount = 0;
 
-for (const time of filteredTimeList) {
+    for (const time of filteredTimeList) {
         let weatherData;
         if (rainCache.has(time)) {
             weatherData = rainCache.get(time);
@@ -195,6 +195,7 @@ for (const time of filteredTimeList) {
     humidityChartCanvas.style.display = 'none';
     pressureChartCanvas.style.display = 'none';
     rainChartCanvas.style.display = 'block';
+    allChartCanvas.style.display = 'none';
 
     historyData.sort((a, b) => a.time - b.time);
 
@@ -278,7 +279,7 @@ map.on('load', async function() {
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
-    timeDisplay.textContent = date.getFullYear() + '-' + 
+    timeDisplay.textContent = date.getFullYear() + '-' +
         String(date.getMonth() + 1).padStart(2, '0') + '-' +
         String(date.getDate()).padStart(2, '0') + ' ' +
         String(date.getHours()).padStart(2, '0') + ':' +

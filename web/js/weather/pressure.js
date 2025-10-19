@@ -165,6 +165,7 @@ const showPressureChart = async (e) => {
     rainChartCanvas.style.display = 'none';
     humidityChartCanvas.style.display = 'none';
     pressureChartCanvas.style.display = 'block';
+    allChartCanvas.style.display = 'none';
 
     historyData.sort((a, b) => a.time - b.time);
 

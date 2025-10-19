@@ -7,6 +7,7 @@ const windChartCanvas = document.getElementById('wind-chart');
 const rainChartCanvas = document.getElementById('rain-chart');
 const humidityChartCanvas = document.getElementById('humidity-chart');
 const pressureChartCanvas = document.getElementById('pressure-chart');
+const allChartCanvas = document.getElementById('all-chart');
 const closeButton = document.querySelector('.chart-close-button');
 const progressContainer = document.getElementById('progress-container');
 const progressBar = document.getElementById('progress-bar');
@@ -85,6 +86,7 @@ function initchartPopup() {
     rainChartCanvas.style.display = 'none';
     humidityChartCanvas.style.display = 'none';
     pressureChartCanvas.style.display = 'none';
+    allChartCanvas.style.display = 'none';
 
     if (window.humidityChart) {
         window.humidityChart.destroy();
@@ -101,13 +103,14 @@ function initchartPopup() {
     if (window.windChart) {
         window.windChart.destroy();
     }
+    if (window.AllChart) {
+        window.AllChart.destroy();
+    }
 }
 window.initchartPopup = initchartPopup;
 
-// instant chart switch on type change
-const typeSwitchHandler = (e) => {
-    const type = e.detail.type;
-    const eventData = {
+function showCharts(types, e) {
+    const baseEvent = e && e.features ? e : {
         features: [{
             properties: {
                 id: chartPopup.dataset.stationId,
@@ -116,17 +119,19 @@ const typeSwitchHandler = (e) => {
         }]
     };
 
-    if (type === 'wind') {
-        window.showWindChart(eventData);
-    } else if (type === 'rain') {
-        window.showRainChart(eventData);
-    } else if (type === 'humidity') {
-        window.showHumidityChart(eventData);
-    } else if (type === 'pressure') {
-        window.showPressureChart(eventData);
-    } else if (type === 'temperature'){
-        window.showTemperatureChart(eventData);
-    }
+    if (types === 'temperature') window.showTemperatureChart(baseEvent);
+    else if (types === 'wind') window.showWindChart(baseEvent);
+    else if (types === 'rain') window.showRainChart(baseEvent);
+    else if (types === 'humidity') window.showHumidityChart(baseEvent);
+    else if (types === 'pressure') window.showPressureChart(baseEvent);
+    else if (types === 'all') window.showAllChart(baseEvent);
+}
+
+// instant chart switch on type change
+const typeSwitchHandler = (e) => {
+    const type = e && e.detail && e.detail.type ? e.detail.type : getChartType();
+    showCharts(type, e);
 };
+
 window.addEventListener('chartTypeChanged', typeSwitchHandler);
 window.addEventListener('chartDurationChanged', typeSwitchHandler);

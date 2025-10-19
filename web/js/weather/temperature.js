@@ -150,6 +150,7 @@ const showTemperatureChart = async (e) => {
     humidityChartCanvas.style.display = 'none';
     pressureChartCanvas.style.display = 'none';
     tempChartCanvas.style.display = 'block';
+    allChartCanvas.style.display = 'none';
 
     historyData.sort((a, b) => a.time - b.time);
 
