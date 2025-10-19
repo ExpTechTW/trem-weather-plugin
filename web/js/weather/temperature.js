@@ -198,8 +198,9 @@ map.on('load', async function() {
         isLoading = true;
 
         // Show popup and progress bar
-        chartPopup.style.display = 'block';
-        progressContainer.style.display = 'block';
+    chartPopup.style.display = 'block';
+    setChartTitle(stationName + ' - 氣溫');
+    progressContainer.style.display = 'block';
         tempChartCanvas.style.display = 'none';
         windChartCanvas.style.display = 'none';
         rainChartCanvas.style.display = 'none';

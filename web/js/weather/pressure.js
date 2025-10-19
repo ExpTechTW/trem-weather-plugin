@@ -203,8 +203,9 @@ map.on('load', async function() {
         isLoading = true;
 
         // 顯示 popup 與進度
-        chartPopup.style.display = 'block';
-        progressContainer.style.display = 'block';
+    chartPopup.style.display = 'block';
+    setChartTitle(stationName + ' - 氣壓');
+    progressContainer.style.display = 'block';
         tempChartCanvas.style.display = 'none';
         windChartCanvas.style.display = 'none';
         rainChartCanvas.style.display = 'none';

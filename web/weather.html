@@ -41,9 +41,12 @@
 
     <div id="chart-popup" class="chart-popup">
         <div class="chart-popup-content">
-            <span class="chart-close-button">&times;</span>
-            <div id="progress-container" style="display: none; width: 100%; background-color: #ddd;">
-                <div id="progress-bar" style="width: 0%; height: 20px; background-color: #4CAF50; text-align: center; line-height: 20px; color: white;">0%</div>
+            <div class="chart-header">
+                <h3 id="chart-title">載入中…</h3>
+                <span class="chart-close-button" aria-label="關閉">&times;</span>
+            </div>
+            <div id="progress-container">
+                <div id="progress-bar">0%</div>
             </div>
             <canvas id="temperature-chart"></canvas>
             <canvas id="wind-chart"></canvas>

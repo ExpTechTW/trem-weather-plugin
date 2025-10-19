@@ -15,7 +15,7 @@
     color: #f1f1f1;
     border: 1px solid #555;
     margin: 15% auto;
-    padding: 35px 10px 10px 10px;
+    padding: 10px 10px 10px 10px;
     width: 80%;
     max-width: 600px;
     position: relative;
@@ -41,17 +41,51 @@
 
 #progress-container {
     width: 100%;
-    background-color: #555;
+    /* use a darker container to match the dark popup and provide contrast */
+    background-color: #3a3a3a;
+    border: 1px solid #555;
     border-radius: 4px;
     margin-bottom: 10px;
+    padding: 3px; /* small padding so the bar sits comfortably inside */
+    display: none; /* default hidden, JS will toggle */
+    box-sizing: border-box;
+}
+
+.chart-title {
+    margin: 0 40px 10px 10px; /* leave space on the right for close button */
+    padding: 0;
+    color: #ddd;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px 10px 10px;
+    box-sizing: border-box;
+}
+
+.chart-header #chart-title {
+    margin: 0;
+    padding: 0;
+}
+
+.chart-header .chart-close-button {
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 1;
 }
 
 #progress-bar {
     width: 0%;
     height: 20px;
-    background-color: #68a96a;
+    background-color: #68a96a; /* slightly softer green */
     text-align: center;
     line-height: 20px;
     color: white;
     border-radius: 4px;
+    transition: width 300ms ease; /* smooth progress animation */
 }
