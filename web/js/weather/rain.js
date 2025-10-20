@@ -152,6 +152,9 @@ const showRainChart = async (e) => {
     const historyData = [];
     let loadedCount = 0;
 
+    // determine desired interval key (default to 'now')
+    const selectedInterval = (window.getRainInterval && typeof window.getRainInterval === 'function') ? window.getRainInterval() : 'now';
+
     for (const time of filteredTimeList) {
         let weatherData;
         if (rainCache.has(time)) {
@@ -163,15 +166,19 @@ const showRainChart = async (e) => {
         }
 
         const stationData = weatherData.find(s => s.id === stationId);
-        if (stationData && stationData.data.now !== -99) {
-            historyData.push({
-                time: parseInt(time),
-                data: stationData.data
-            });
+        if (stationData) {
+            const key = selectedInterval || 'now';
+            const val = stationData.data[key];
+            if (val !== -99) {
+                historyData.push({
+                    time: parseInt(time),
+                    value: val
+                });
+            }
         }
 
         loadedCount++;
-        const progress = Math.round((loadedCount / timeList.length) * 100);
+        const progress = Math.round((loadedCount / filteredTimeList.length) * 100);
         progressBar.style.width = progress + '%';
         progressBar.textContent = progress + '%';
 
@@ -201,9 +208,10 @@ const showRainChart = async (e) => {
 
     const labels = historyData.map(d => {
         const date = new Date(d.time);
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        // return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     });
-    const rainfalls = historyData.map(d => d.data.now);
+    const rainfalls = historyData.map(d => d.value);
 
     const textColor = '#f1f1f1';
     const gridColor = 'rgba(255, 255, 255, 0.1)';

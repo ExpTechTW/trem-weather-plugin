@@ -17,7 +17,7 @@ let isLoading = false;
 let shouldStopLoading = false;
 
 // chart duration state (in hours). null means all available
-let chartDurationHours = null;
+let chartDurationHours = 6;
 
 function setChartTitle(text) {
 	if (chartTitle) chartTitle.textContent = text;
@@ -48,6 +48,7 @@ window.filterTimeListByDuration = filterTimeListByDuration;
 // Wire up duration and type select if present
 const durationSelect = document.getElementById('chart-duration-select');
 const chartTypeSelect = document.getElementById('chart-type-select');
+const rainIntervalSelect = document.getElementById('rain-interval-select');
 
 let chartType = 'temperature';
 function setChartType(type) {
@@ -63,6 +64,14 @@ if (chartTypeSelect) {
 	chartTypeSelect.addEventListener('change', () => {
 		setChartType(chartTypeSelect.value);
 		window.dispatchEvent(new CustomEvent('chartTypeChanged', { detail: { type: chartTypeSelect.value }, }));
+        // show rain interval selector only when rain is selected
+        if (rainIntervalSelect) {
+            if (chartTypeSelect.value === 'rain' || chartTypeSelect.value === 'all') {
+                rainIntervalSelect.style.display = 'block';
+            } else {
+                rainIntervalSelect.style.display = 'none';
+            }
+        }
 	});
 }
 if (durationSelect) {
@@ -71,6 +80,21 @@ if (durationSelect) {
 		setChartDuration(val);
 		window.dispatchEvent(new CustomEvent('chartDurationChanged', { detail: { type: chartTypeSelect.value } }));
 	});
+}
+
+// rain interval events
+if (rainIntervalSelect) {
+    // expose getter
+    function getRainInterval() { return rainIntervalSelect.value; }
+    window.getRainInterval = getRainInterval;
+
+    rainIntervalSelect.addEventListener('change', () => {
+        if (chartTypeSelect.value === 'rain') {
+            window.dispatchEvent(new CustomEvent('chartTypeChanged', { detail: { type: 'rain' } }));
+        } else if (chartTypeSelect.value === 'all') {
+            window.dispatchEvent(new CustomEvent('chartTypeChanged', { detail: { type: 'all' } }));
+        }
+    });
 }
 
 function initchartPopup() {

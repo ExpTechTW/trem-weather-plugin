@@ -142,7 +142,7 @@ const showPressureChart = async (e) => {
         }
 
         loadedCount++;
-        const progress = Math.round((loadedCount / timeList.length) * 100);
+        const progress = Math.round((loadedCount / filteredTimeList.length) * 100);
         progressBar.style.width = progress + '%';
         progressBar.textContent = progress + '%';
 
@@ -171,7 +171,8 @@ const showPressureChart = async (e) => {
 
     const labels = historyData.map(d => {
         const date = new Date(d.time);
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        // return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     });
     const pressures = historyData.map(d => d.data.air.pressure);
 

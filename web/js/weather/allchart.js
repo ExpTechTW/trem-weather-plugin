@@ -33,6 +33,9 @@ const showAllChart = async (e) => {
     const historyData = [];
     let loadedCount = 0;
 
+    // determine desired interval key (default to 'now')
+    const selectedInterval = (window.getRainInterval && typeof window.getRainInterval === 'function') ? window.getRainInterval() : 'now';
+
     for (const time of filteredTimeList) {
         let weatherData;
         if (weatherCache.has(time)) {
@@ -68,7 +71,7 @@ const showAllChart = async (e) => {
         const humidityVal = stationData && stationData.data && stationData.data.air ? stationData.data.air.relative_humidity : -99;
         const pressureVal = stationData && stationData.data && stationData.data.air ? stationData.data.air.pressure : -99;
         const windVal = stationData && stationData.data && stationData.data.wind ? stationData.data.wind.speed : -99;
-        const rainVal = rainStation && rainStation.data ? (rainStation.data.now !== undefined ? rainStation.data.now : (rainStation.data.rainfall !== undefined ? rainStation.data.rainfall : -99)) : -99;
+        const rainVal = rainStation && rainStation.data[selectedInterval] ? rainStation.data[selectedInterval] : -99;
 
         // Only push a record if at least one metric is valid
         if ([tempVal, humidityVal, pressureVal, windVal, rainVal].some(v => v !== -99 && v !== null && v !== undefined)) {
@@ -85,7 +88,7 @@ const showAllChart = async (e) => {
         }
 
         loadedCount++;
-        const progress = Math.round((loadedCount / timeList.length) * 100);
+        const progress = Math.round((loadedCount / filteredTimeList.length) * 100);
         progressBar.style.width = progress + '%';
         progressBar.textContent = progress + '%';
 
@@ -114,7 +117,8 @@ const showAllChart = async (e) => {
 
     const labels = historyData.map(d => {
         const date = new Date(d.time);
-        return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        // return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        return `${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     });
 
     const temperatures = historyData.map(d => d.data.temperature);

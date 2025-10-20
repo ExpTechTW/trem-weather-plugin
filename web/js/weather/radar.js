@@ -43,9 +43,12 @@ window.radarLayer = {
             String(date.getHours()).padStart(2, '0') + ':' +
             String(date.getMinutes()).padStart(2, '0');
 
-        map.getSource('radarTiles').setTiles([
-            `https://api-1.exptech.dev/api/v1/tiles/radar/${targetTime}/{z}/{x}/{y}.png`
-        ]);
+        const radarSource = map.getSource('radarTiles');
+        if (radarSource) {
+            radarSource.setTiles([
+                `https://api-1.exptech.dev/api/v1/tiles/radar/${targetTime}/{z}/{x}/{y}.png`
+            ]);
+        }
     }
 };
 

@@ -55,10 +55,22 @@
                         <option value="all">全部</option>
                     </select>
                     <select id="chart-duration-select" aria-label="選擇時長">
-                        <option value="6">6 小時</option>
+                        <option value="6" selected>6 小時</option>
                         <option value="12">12 小時</option>
                         <option value="24">24 小時</option>
-                        <option value="all" selected>全部</option>
+                        <option value="all">全部</option>
+                    </select>
+                    <!-- Rain interval selector: shown only when chart type is 'rain' -->
+                    <select id="rain-interval-select" aria-label="選擇雨量統計時段">
+                        <option value="now" selected>現在</option>
+                        <option value="10m">10 分鐘</option>
+                        <option value="1h">1 小時</option>
+                        <option value="3h">3 小時</option>
+                        <option value="6h">6 小時</option>
+                        <option value="12h">12 小時</option>
+                        <option value="24h">24 小時</option>
+                        <option value="2d">2 天</option>
+                        <option value="3d">3 天</option>
                     </select>
                     <span class="chart-close-button" aria-label="關閉">&times;</span>
                 </div>
@@ -82,6 +94,8 @@
     <script src="./js/weather/radarRain.js"></script>
     <script src="./js/weather/rain.js"></script>
     <script src="./js/weather/temperature.js"></script>
+    <script src="./js/weather/temphigh.js"></script>
+    <script src="./js/weather/templow.js"></script>
     <script src="./js/weather/humidity.js"></script>
     <script src="./js/weather/pressure.js"></script>
     <script src="./js/weather/wind.js"></script>
