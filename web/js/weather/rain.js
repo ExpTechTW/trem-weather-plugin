@@ -63,34 +63,34 @@ window.rainLayer = {
                 let rainfall;
                 switch(interval) {
                     case 'now':
-                        rainfall = station.data.now;
+                        rainfall = station.data['now'];
                         break;
                     case '10m':
-                        rainfall = station.data.tenMinutes;
+                        rainfall = station.data['10m'];
                         break;
                     case '1h':
-                        rainfall = station.data.oneHour;
+                        rainfall = station.data['1h'];
                         break;
                     case '3h':
-                        rainfall = station.data.threeHours;
+                        rainfall = station.data['3h'];
                         break;
                     case '6h':
-                        rainfall = station.data.sixHours;
+                        rainfall = station.data['6h'];
                         break;
                     case '12h':
-                        rainfall = station.data.twelveHours;
+                        rainfall = station.data['12h'];
                         break;
                     case '24h':
-                        rainfall = station.data.twentyFourHours;
+                        rainfall = station.data['24h'];
                         break;
                     case '2d':
-                        rainfall = station.data.twoDays;
+                        rainfall = station.data['2d'];
                         break;
                     case '3d':
-                        rainfall = station.data.threeDays;
+                        rainfall = station.data['3d'];
                         break;
                     default:
-                        rainfall = station.data.now;
+                        rainfall = station.data['now'];
                 }
 
                 if (rainfall === -99) return null;

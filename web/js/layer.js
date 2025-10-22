@@ -34,6 +34,19 @@ class LayerMenu {
                     </svg>
                     雨量
                 </li>
+                <div class="time-interval-container">
+                    <select id="interval-selector">
+                        <option value="now" selected>現在</option>
+                        <option value="10m">10 分鐘</option>
+                        <option value="1h">1 小時</option>
+                        <option value="3h">3 小時</option>
+                        <option value="6h">6 小時</option>
+                        <option value="12h">12 小時</option>
+                        <option value="24h">24 小時</option>
+                        <option value="2d">2 天</option>
+                        <option value="3d">3 天</option>
+                    </select>
+                </div>
                 <li class="layer-item" data-layer="temperature">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
@@ -155,8 +168,8 @@ class LayerMenu {
         };
 
         // 隱藏所有圖層
-        Object.values(layers).forEach(layer => {
-            if (layer) layer.hide();
+        Object.values(layers).forEach(l => {
+            if (l) l.hide();
         });
 
         // 顯示/隱藏播放功能
@@ -174,6 +187,11 @@ class LayerMenu {
         if (layers[layer]) {
             layers[layer].show();
             layers[layer].updateTime();
+        }
+
+        const intervalContainer = document.querySelector('.time-interval-container');
+        if (intervalContainer) {
+            intervalContainer.style.display = (layer === 'rain') ? 'block' : 'none';
         }
 
         this.updateCurrentLayerDisplay(layer);
@@ -202,19 +220,35 @@ class LayerMenu {
 window.addEventListener('DOMContentLoaded', () => {
     window.layerMenu = new LayerMenu();
 
-    // 監聽 timeSelector 變更，呼叫對應 activeLayer 的 updateTime
+    // 監聽 timeSelector 和 interval-selector 變更
     document.addEventListener('change', function(e) {
-        if (e.target && e.target.id === 'time-selector') {
-            const val = e.target.value;
-            if (!val) return;
-            // yyyy-mm-ddThh:mm 轉 yyyy-mm-dd hh:mm
-            const timeStr = val.replace('T', ' ');
+        if (e.target && (e.target.id === 'time-selector' || e.target.id === 'interval-selector')) {
+            let timeStr;
+            // If time-selector triggered the change, use its value
+            if (e.target.id === 'time-selector') {
+                timeStr = e.target.value.replace('T', ' ');
+            } else {
+                // Otherwise (interval-selector changed), use the time from time-display
+                const timeDisplay = document.getElementById('time-display');
+                if (timeDisplay && timeDisplay.textContent) {
+                    timeStr = timeDisplay.textContent;
+                } else {
+                    // Fallback to current time if time-display is not available
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    timeStr = now.toISOString().slice(0, 16).replace('T', ' ');
+                }
+            }
+
+            if (!timeStr) return;
+
             const activeLayer = window.layerMenu && window.layerMenu.activeLayer;
-            // interval 可根據 UI 需求取得，這裡預設為 'now'，可擴充
             let interval = 'now';
-            // 例如可從某個 interval selector 取得值
-            // const intervalSelector = document.getElementById('interval-selector');
-            // if (intervalSelector) interval = intervalSelector.value;
+            const intervalSelector = document.getElementById('interval-selector');
+            if (intervalSelector) {
+                interval = intervalSelector.value;
+            }
+
             const layerMap = {
                 radar: window.radarLayer,
                 radarRain: window.radarRainLayer,
@@ -229,6 +263,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 wind: window.windLayer,
                 lightning: window.lightningLayer
             };
+
             const layerObj = layerMap[activeLayer];
             if (layerObj && typeof layerObj.updateTime === 'function') {
                 layerObj.updateTime(timeStr);

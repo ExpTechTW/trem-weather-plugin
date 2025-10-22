@@ -111,3 +111,20 @@
     right: auto;
     top: 45px;
 } 
+
+.time-interval-container {
+    padding: 10px;
+    background-color: #1f2025;
+    border-top: 1px solid #3a3b40;
+    display: none;
+}
+
+#interval-selector {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #3a3b40;
+    background-color: #2a2b30;
+    color: #e3e3e3;
+    font-size: 14px;
+}
