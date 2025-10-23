@@ -1,6 +1,6 @@
 class LayerMenu {
     constructor() {
-        this.activeLayer = 'radar';
+        this.activeLayers = new Set(['radar']);
         this.init();
     }
 
@@ -98,7 +98,7 @@ class LayerMenu {
         const display = document.createElement('div');
         display.className = 'current-layer-display';
         document.body.appendChild(display);
-        this.updateCurrentLayerDisplay('radar');
+        this.updateCurrentLayerDisplay();
 
         display.addEventListener('click', () => {
             display.classList.toggle('active');
@@ -120,15 +120,26 @@ class LayerMenu {
         });
     }
 
-    updateCurrentLayerDisplay(layer) {
+    updateCurrentLayerDisplay() {
         const display = document.querySelector('.current-layer-display');
-        const layerItem = document.querySelector(`[data-layer="${layer}"]`);
-        if (display && layerItem) {
-            const icon = layerItem.querySelector('svg').cloneNode(true);
-            const text = layerItem.textContent.trim();
-            display.innerHTML = '';
-            display.appendChild(icon);
-            display.appendChild(document.createTextNode(text));
+        if (display) {
+            if (this.activeLayers.size > 1) {
+                display.innerHTML = '';
+                const text = '多圖層';
+                display.appendChild(document.createTextNode(text));
+            } else if (this.activeLayers.size === 1) {
+                const layer = this.activeLayers.values().next().value;
+                const layerItem = document.querySelector(`[data-layer="${layer}"]`);
+                if (layerItem) {
+                    const icon = layerItem.querySelector('svg').cloneNode(true);
+                    const text = layerItem.textContent.trim();
+                    display.innerHTML = '';
+                    display.appendChild(icon);
+                    display.appendChild(document.createTextNode(text));
+                }
+            } else {
+                display.innerHTML = '';
+            }
         }
     }
 
@@ -140,20 +151,38 @@ class LayerMenu {
         layerItems.forEach(item => {
             item.addEventListener('click', () => {
                 const layer = item.dataset.layer;
-                this.switchLayer(layer);
+                const exclusiveGroups = [
+                    ['radar', 'radarRain'],
+                    ['temperature', 'tempHigh', 'tempLow'],
+                ];
 
-                layerItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+                if (this.activeLayers.has(layer)) {
+                    this.activeLayers.delete(layer);
+                    item.classList.remove('active');
+                } else {
+                    this.activeLayers.add(layer);
+                    item.classList.add('active');
 
-                display.classList.remove('active');
-                menu.classList.remove('active');
+                    const group = exclusiveGroups.find(g => g.includes(layer));
+                    if (group) {
+                        group.forEach(layerInGroup => {
+                            if (layerInGroup !== layer && this.activeLayers.has(layerInGroup)) {
+                                this.activeLayers.delete(layerInGroup);
+                                const itemToDeactivate = document.querySelector(`[data-layer="${layerInGroup}"]`);
+                                if (itemToDeactivate) {
+                                    itemToDeactivate.classList.remove('active');
+                                }
+                            }
+                        });
+                    }
+                }
 
-                localStorage.setItem('activeLayer', layer);
+                this.updateLayers();
             });
         });
     }
 
-    switchLayer(layer) {
+    updateLayers() {
         const layers = {
             temperature: window.temperatureLayer,
             tempHigh: window.temperatureHighLayer,
@@ -167,39 +196,39 @@ class LayerMenu {
             lightning: window.lightningLayer
         };
 
-        // 隱藏所有圖層
-        Object.values(layers).forEach(l => {
-            if (l) l.hide();
+        Object.keys(layers).forEach(layerKey => {
+            const layer = layers[layerKey];
+            if (layer) {
+                if (this.activeLayers.has(layerKey)) {
+                    layer.show();
+                    layer.updateTime();
+                } else {
+                    layer.hide();
+                }
+            }
         });
 
         // 顯示/隱藏播放功能
         const playBtn = document.getElementById('radar-play-btn');
         const speedSel = document.getElementById('radar-speed-sel');
         const rangeSel = document.getElementById('radar-range-sel');
-        if (playBtn) playBtn.style.display = (layer === 'radar') ? '' : 'none';
-        if (speedSel) speedSel.style.display = (layer === 'radar') ? '' : 'none';
-        if (rangeSel) rangeSel.style.display = (layer === 'radar') ? '' : 'none';
+        if (playBtn) playBtn.style.display = this.activeLayers.has('radar') ? '' : 'none';
+        if (speedSel) speedSel.style.display = this.activeLayers.has('radar') ? '' : 'none';
+        if (rangeSel) rangeSel.style.display = this.activeLayers.has('radar') ? '' : 'none';
 
         const radarRainControls = document.getElementById('radar-rain-controls');
-        if (radarRainControls) radarRainControls.style.display = (layer === 'radarRain') ? 'flex' : 'none';
-
-        // 顯示選定的圖層
-        if (layers[layer]) {
-            layers[layer].show();
-            layers[layer].updateTime();
-        }
+        if (radarRainControls) radarRainControls.style.display = this.activeLayers.has('radarRain') ? 'flex' : 'none';
 
         const intervalContainer = document.querySelector('.time-interval-container');
         if (intervalContainer) {
-            intervalContainer.style.display = (layer === 'rain') ? 'block' : 'none';
+            intervalContainer.style.display = this.activeLayers.has('rain') ? 'block' : 'none';
         }
 
-        this.updateCurrentLayerDisplay(layer);
-        this.activeLayer = layer;
+        this.updateCurrentLayerDisplay();
 
         if (chartTypeSelect) {
             if (rainIntervalSelect) {
-                if (layer === 'rain' || layer === 'all') {
+                if (this.activeLayers.has('rain') || this.activeLayers.has('all')) {
                     rainIntervalSelect.style.display = 'block';
                 } else {
                     rainIntervalSelect.style.display = 'none';
@@ -209,11 +238,7 @@ class LayerMenu {
     }
 
     loadActiveLayer() {
-        const layerItem = document.querySelector(`[data-layer="radar"]`);
-        if (layerItem) {
-            layerItem.classList.add('active');
-            this.switchLayer('radar');
-        }
+        this.updateLayers();
     }
 }
 
@@ -242,7 +267,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
             if (!timeStr) return;
 
-            const activeLayer = window.layerMenu && window.layerMenu.activeLayer;
+            const activeLayers = window.layerMenu && window.layerMenu.activeLayers;
+            if (!activeLayers) return;
+
             let interval = 'now';
             const intervalSelector = document.getElementById('interval-selector');
             if (intervalSelector) {
@@ -264,10 +291,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 lightning: window.lightningLayer
             };
 
-            const layerObj = layerMap[activeLayer];
-            if (layerObj && typeof layerObj.updateTime === 'function') {
-                layerObj.updateTime(timeStr);
-            }
+            activeLayers.forEach(activeLayer => {
+                const layerObj = layerMap[activeLayer];
+                if (layerObj && typeof layerObj.updateTime === 'function') {
+                    layerObj.updateTime(timeStr);
+                }
+            });
         }
     });
 });
