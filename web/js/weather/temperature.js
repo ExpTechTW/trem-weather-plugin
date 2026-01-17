@@ -17,9 +17,9 @@ window.temperatureLayer = {
         }
     },
     updateTime: async function(timeStr = undefined) {
-        const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+        const response = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await response.json();
-        let targetTime = timeList[timeList.length - 1];
+        let targetTime = timeList[0];
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
@@ -43,7 +43,7 @@ window.temperatureLayer = {
             String(date.getHours()).padStart(2, '0') + ':' +
             String(date.getMinutes()).padStart(2, '0');
 
-        const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${targetTime}`);
+        const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${targetTime}`);
         const weatherData = await weatherResponse.json();
 
         const temperatureData = weatherData
@@ -101,7 +101,7 @@ const showTemperatureChart = async (e) => {
         }
     }
 
-    const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const listResponse = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await listResponse.json();
     const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
 
@@ -113,7 +113,7 @@ const showTemperatureChart = async (e) => {
         if (weatherCache.has(time)) {
             weatherData = weatherCache.get(time);
         } else {
-            const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
+            const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${time}`);
             weatherData = await weatherResponse.json();
             weatherCache.set(time, weatherData);
         }
@@ -229,9 +229,9 @@ const showTemperatureChart = async (e) => {
 window.showTemperatureChart = showTemperatureChart;
 
 map.on('load', async function() {
-    const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const response = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
+    const latestTime = timeList[0];
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
@@ -241,7 +241,7 @@ map.on('load', async function() {
         String(date.getHours()).padStart(2, '0') + ':' +
         String(date.getMinutes()).padStart(2, '0');
 
-    const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${latestTime}`);
+    const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${latestTime}`);
     const weatherData = await weatherResponse.json();
     weatherCache.set(latestTime, weatherData);
 

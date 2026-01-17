@@ -34,7 +34,7 @@ function getChartDuration() {
 function filterTimeListByDuration(timeList) {
 	if (!chartDurationHours) return timeList;
 	// timeList are timestamps in string form; take last timestamp as latest
-	const latest = Number(timeList[timeList.length - 1]);
+	const latest = Number(timeList[0]);
 	const cutoff = latest - chartDurationHours * 3600 * 1000;
 	return timeList.filter(t => Number(t) >= cutoff);
 }

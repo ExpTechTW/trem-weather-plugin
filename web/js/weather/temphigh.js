@@ -18,9 +18,9 @@ window.temperatureHighLayer = {
     },
     updateTime: async function(timeStr = undefined) {
         // 與 temperature.js 類似的時間選擇邏輯
-        const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+        const response = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await response.json();
-        let targetTime = timeList[timeList.length - 1];
+        let targetTime = timeList[0];
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
@@ -46,7 +46,7 @@ window.temperatureHighLayer = {
                 String(date.getMinutes()).padStart(2, '0');
         }
 
-        const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${targetTime}`);
+        const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${targetTime}`);
         const weatherData = await weatherResponse.json();
 
         const temperatureHighData = weatherData
@@ -89,11 +89,11 @@ window.temperatureHighLayer = {
 
 map.on('load', async function() {
     try {
-        const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+        const listResponse = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await listResponse.json();
-        const latestTime = timeList[timeList.length - 1];
+        const latestTime = timeList[0];
 
-        const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${latestTime}`);
+        const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${latestTime}`);
         const weatherData = await weatherResponse.json();
 
         const temperatureHighData = weatherData

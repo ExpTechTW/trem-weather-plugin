@@ -26,7 +26,7 @@ const showAllChart = async (e) => {
         }
     }
 
-    const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const listResponse = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await listResponse.json();
     const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
 
@@ -41,7 +41,7 @@ const showAllChart = async (e) => {
         if (weatherCache.has(time)) {
             weatherData = weatherCache.get(time);
         } else {
-            const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
+            const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${time}`);
             weatherData = await weatherResponse.json();
             weatherCache.set(time, weatherData);
         }
@@ -53,7 +53,7 @@ const showAllChart = async (e) => {
                 if (rainCache.has(time)) {
                     rainData = rainCache.get(time);
                 } else {
-                    const rainResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/rain/${time}`);
+                    const rainResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/rain/${time}`);
                     rainData = await rainResponse.json();
                     rainCache.set(time, rainData);
                 }

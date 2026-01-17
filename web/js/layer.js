@@ -138,7 +138,7 @@ class LayerMenu {
                     display.appendChild(document.createTextNode(text));
                 }
             } else {
-                display.innerHTML = '';
+                display.innerHTML = '未選擇圖層';
             }
         }
     }

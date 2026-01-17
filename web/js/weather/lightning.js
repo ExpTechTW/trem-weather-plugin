@@ -12,10 +12,10 @@ window.lightningLayer = {
     },
     updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
-        const timeListResponse = await fetch('https://api-1.exptech.dev/api/v1/meteor/lightning/list');
+        const timeListResponse = await fetch('https://api-1.exptech.dev/api/v2/meteor/lightning/list');
         const timeList = await timeListResponse.json();
 
-        let time = timeList[timeList.length - 1];
+        let time = timeList[0];
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
@@ -40,7 +40,7 @@ window.lightningLayer = {
             String(date.getMinutes()).padStart(2, '0');
 
         try {
-            const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/lightning/${time}`);
+            const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/lightning/${time}`);
             if (!lightningResponse.ok) {
                 throw new Error(`HTTP error! status: ${lightningResponse.status}`);
             }
@@ -115,12 +115,12 @@ map.on('load', async function() {
     }
 
     // 獲取最新時間
-    const response = await fetch('https://api-1.exptech.dev/api/v1/meteor/lightning/list');
+    const response = await fetch('https://api-1.exptech.dev/api/v2/meteor/lightning/list');
     const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
+    const latestTime = timeList[0];
 
     // 獲取閃電資料
-    const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/lightning/${latestTime}`);
+    const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/lightning/${latestTime}`);
     const lightningData = await lightningResponse.json();
 
     const lightningFeatures = lightningData

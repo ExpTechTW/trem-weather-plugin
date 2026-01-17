@@ -18,9 +18,9 @@ window.pressureLayer = {
     },
     updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
-        const timeListResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+        const timeListResponse = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await timeListResponse.json();
-        let targetTime = timeList[timeList.length - 1];
+        let targetTime = timeList[0];
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
@@ -51,7 +51,7 @@ window.pressureLayer = {
             String(date.getMinutes()).padStart(2, '0');
 
         try {
-            const pressureResponse = await fetch(`https://api-1.exptech.dev/api/v1/meteor/weather/${targetTime}`);
+            const pressureResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/weather/${targetTime}`);
             if (!pressureResponse.ok) {
                 throw new Error(`HTTP error! status: ${pressureResponse.status}`);
             }
@@ -116,7 +116,7 @@ const showPressureChart = async (e) => {
         }
     }
 
-    const listResponse = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const listResponse = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await listResponse.json();
     const filteredTimeList = window.filterTimeListByDuration ? window.filterTimeListByDuration(timeList) : timeList;
 
@@ -128,7 +128,7 @@ const showPressureChart = async (e) => {
         if (weatherCache.has(time)) {
             weatherData = weatherCache.get(time);
         } else {
-            const weatherResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${time}`);
+            const weatherResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${time}`);
             weatherData = await weatherResponse.json();
             weatherCache.set(time, weatherData);
         }
@@ -224,9 +224,9 @@ const showPressureChart = async (e) => {
 window.showPressureChart = showPressureChart;
 
 map.on('load', async function() {
-    const response = await fetch('https://api.exptech.dev/api/v1/meteor/weather/list');
+    const response = await fetch('https://api.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
+    const latestTime = timeList[0];
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
@@ -236,7 +236,7 @@ map.on('load', async function() {
         String(date.getHours()).padStart(2, '0') + ':' +
         String(date.getMinutes()).padStart(2, '0');
 
-    const pressureResponse = await fetch(`https://api.exptech.dev/api/v1/meteor/weather/${latestTime}`);
+    const pressureResponse = await fetch(`https://api.exptech.dev/api/v2/meteor/weather/${latestTime}`);
     const pressureData = await pressureResponse.json();
 
     const pressureFeatures = pressureData

@@ -16,7 +16,7 @@ window.radarLayer = {
         // timeStr: yyyy-mm-dd hh:mm，若未傳則用最新
         const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
         const timeList = await response.json();
-        let targetTime = timeList[timeList.length - 1];
+        let targetTime = timeList[0];
 
         if (timeStr) {
             // 轉成 timestamp 字串（毫秒）
@@ -220,7 +220,7 @@ createRadarPlayButton();
 map.on('load', async function () {
     const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
     const timeList = await response.json();
-    const latestTime = timeList[timeList.length - 1];
+    const latestTime = timeList[0];
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));
