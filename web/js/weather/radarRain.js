@@ -36,7 +36,7 @@ window.radarRainLayer = {
     },
     updateTime: async function(timeStr = undefined) {
         // timeStr: yyyy-mm-dd hh:mm，若未傳則用最新
-        const response = await fetch('https://api.exptech.dev/api/v1/tiles/rain/list');
+        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
         const timeList = await response.json();
         for (let i = 0; i < 3; i++) {
             let targetTime = timeList[i][0];
@@ -228,7 +228,7 @@ async function startRadarRainPlay() {
     const btn = document.getElementById('radar-play-btn');
     btn.textContent = '⏸';
     btn.style.background = '#3a3b40';
-    const response = await fetch('https://api.exptech.dev/api/v1/tiles/rain/list');
+    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
     const timeList = await response.json();
     // 取得區間
     const rangeSel = document.getElementById('radar-range-sel');
@@ -301,7 +301,7 @@ function stopRadarRainPlay() {
 createRadarRainButtons();
 
 map.on('load', async function () {
-    const response = await fetch('https://api.exptech.dev/api/v1/tiles/rain/list');
+    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
     const timeList = await response.json();
     for (let i = 0; i < 3; i++) {
         const latestTime = timeList[i][0];

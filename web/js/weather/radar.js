@@ -14,9 +14,9 @@ window.radarLayer = {
     },
     updateTime: async function(timeStr = undefined) {
         // timeStr: yyyy-mm-dd hh:mm，若未傳則用最新
-        const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
+        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/radar/list');
         const timeList = await response.json();
-        let targetTime = timeList[0];
+         let targetTime = timeList[timeList.length - 1];
 
         if (timeStr) {
             // 轉成 timestamp 字串（毫秒）
@@ -153,7 +153,7 @@ async function startRadarPlay() {
     if (isRadarPlaying) return;
     isRadarPlaying = true;
     document.getElementById('radar-play-btn').textContent = '⏸';
-    const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
+    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/radar/list');
     const timeList = await response.json();
     // 取得區間
     const rangeSel = document.getElementById('radar-range-sel');
@@ -218,9 +218,9 @@ function stopRadarPlay() {
 createRadarPlayButton();
 
 map.on('load', async function () {
-    const response = await fetch('https://api.exptech.dev/api/v1/tiles/radar/list');
+    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/radar/list');
     const timeList = await response.json();
-    const latestTime = timeList[0];
+    const latestTime = timeList[timeList.length - 1];
 
     const timeDisplay = document.getElementById('time-display');
     const date = new Date(parseInt(latestTime));

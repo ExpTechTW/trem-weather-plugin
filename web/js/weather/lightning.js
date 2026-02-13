@@ -117,7 +117,7 @@ map.on('load', async function() {
     // 獲取最新時間
     const response = await fetch('https://api-1.exptech.dev/api/v2/meteor/lightning/list');
     const timeList = await response.json();
-    const latestTime = timeList[0];
+    const latestTime = timeList[timeList.length - 1];
 
     // 獲取閃電資料
     const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/lightning/${latestTime}`);

@@ -1,26 +1,26 @@
-// temperatureHighLayer: mirror temperature.js but use daily.high.temperature
-function updateTempHighLegend(features) {
-    let container = document.getElementById('temp-high-legend-container');
+// temperatureDiffHighLayer: difference between daily high and low
+function updateTempDiffLegend(features) {
+    let container = document.getElementById('temp-diff-legend-container');
     if (!container) {
         container = document.createElement('div');
-        container.id = 'temp-high-legend-container';
+        container.id = 'temp-diff-legend-container';
         container.style.cssText = 'position: absolute; bottom: 60px; right: 30px; left: 30px; background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; width: 220px; z-index: 1000; display: none; font-size: 12px; font-family: "Noto Sans Regular", sans-serif; box-shadow: 0 0 10px rgba(0,0,0,0.5);';
 
         // Add custom scrollbar styles
         const style = document.createElement('style');
         style.textContent = `
-            #temp-high-legend-container::-webkit-scrollbar {
+            #temp-diff-legend-container::-webkit-scrollbar {
                 width: 6px;
             }
-            #temp-high-legend-container::-webkit-scrollbar-track {
+            #temp-diff-legend-container::-webkit-scrollbar-track {
                 background: rgba(0, 0, 0, 0.3);
                 border-radius: 3px;
             }
-            #temp-high-legend-container::-webkit-scrollbar-thumb {
+            #temp-diff-legend-container::-webkit-scrollbar-thumb {
                 background: rgba(255, 255, 255, 0.3);
                 border-radius: 3px;
             }
-            #temp-high-legend-container::-webkit-scrollbar-thumb:hover {
+            #temp-diff-legend-container::-webkit-scrollbar-thumb:hover {
                 background: rgba(255, 255, 255, 0.5);
             }
         `;
@@ -28,10 +28,10 @@ function updateTempHighLegend(features) {
 
         const header = document.createElement('div');
         header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; cursor: pointer; border-bottom: 1px solid #666; padding-bottom: 5px;';
-        header.innerHTML = '<span style="font-weight: bold; font-size: 14px;">最高溫統計 & 圖例</span><span id="temp-high-toggle-icon" style="font-size: 12px;">▼</span>';
+        header.innerHTML = '<span style="font-weight: bold; font-size: 14px;">溫差統計 & 圖例</span><span id="temp-diff-toggle-icon" style="font-size: 12px;">▼</span>';
         header.onclick = function () {
-            const content = document.getElementById('temp-high-content');
-            const icon = document.getElementById('temp-high-toggle-icon');
+            const content = document.getElementById('temp-diff-content');
+            const icon = document.getElementById('temp-diff-toggle-icon');
             if (content.style.display === 'none') {
                 content.style.display = 'block';
                 icon.textContent = '▼';
@@ -43,28 +43,28 @@ function updateTempHighLegend(features) {
         container.appendChild(header);
 
         const content = document.createElement('div');
-        content.id = 'temp-high-content';
+        content.id = 'temp-diff-content';
         container.appendChild(content);
 
         document.body.appendChild(container);
     }
 
-    const content = document.getElementById('temp-high-content');
+    const content = document.getElementById('temp-diff-content');
 
     // Legend
     let html = '<div style="margin-bottom: 15px; margin-top: 5px;">';
     html += '<div style="margin-bottom: 5px; font-weight: bold;">圖例 (°C)</div>';
-    html += '<div style="background: linear-gradient(to right, #6495ED 0%, #95d07e 25%, #f6e78b 50%, #FF4500 75%, #8B0000 100%); height: 12px; border-radius: 6px; border: 1px solid #555;"></div>';
+    html += '<div style="background: linear-gradient(to right, #ffffff 0%, #f6e78b 33%, #FF4500 66%, #8B0000 100%); height: 12px; border-radius: 6px; border: 1px solid #555;"></div>';
     html += '<div style="display: flex; justify-content: space-between; margin-top: 4px; color: #ddd; font-size: 11px;">';
-    html += '<span>0</span><span>10</span><span>20</span><span>30</span><span>40+</span>';
+    html += '<span>0</span><span>5</span><span>10</span><span>15+</span>';
     html += '</div></div>';
 
     // Ranking
     const sorted = [...features]
-        .sort((a, b) => b.properties.temperatureHigh - a.properties.temperatureHigh)
+        .sort((a, b) => b.properties.tempDiff - a.properties.tempDiff)
         .slice(0, 20);
 
-    html += '<div style="margin-bottom: 5px; font-weight: bold;">最高溫排行 (Top 20)</div>';
+    html += '<div style="margin-bottom: 5px; font-weight: bold;">最大溫差排行 (Top 20)</div>';
     html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
     sorted.forEach((f, i) => {
         const p = f.properties;
@@ -74,7 +74,7 @@ function updateTempHighLegend(features) {
         html += `<tr style="background: ${rowBg}; cursor: pointer;" onclick="map.flyTo({center: [${coords[0]}, ${coords[1]}], zoom: 12});">
             <td style="padding: 3px 5px; color: ${rankColor}; width: 25px; text-align: center;">${i + 1}</td>
             <td style="padding: 3px 5px;">${p.name}</td>
-            <td style="padding: 3px 5px; text-align: right; font-family: monospace;">${p.temperatureHigh.toFixed(1)}</td>
+            <td style="padding: 3px 5px; text-align: right; font-family: monospace;">${p.tempDiff.toFixed(1)}</td>
         </tr>`;
     });
     html += '</table>';
@@ -82,32 +82,31 @@ function updateTempHighLegend(features) {
     content.innerHTML = html;
 }
 
-window.temperatureHighLayer = {
-    show: function() {
-        if (map.getLayer('temperatureHigh-circles')) {
-            map.setLayoutProperty('temperatureHigh-circles', 'visibility', 'visible');
+window.temperatureDiffHighLayer = {
+    show: function () {
+        if (map.getLayer('tempDiffHigh-circles')) {
+            map.setLayoutProperty('tempDiffHigh-circles', 'visibility', 'visible');
         }
-        if (map.getLayer('temperatureHigh-labels')) {
-            map.setLayoutProperty('temperatureHigh-labels', 'visibility', 'visible');
+        if (map.getLayer('tempDiffHigh-labels')) {
+            map.setLayoutProperty('tempDiffHigh-labels', 'visibility', 'visible');
         }
-        const container = document.getElementById('temp-high-legend-container');
+        const container = document.getElementById('temp-diff-legend-container');
         if (container) container.style.display = 'block';
     },
-    hide: function() {
-        if (map.getLayer('temperatureHigh-circles')) {
-            map.setLayoutProperty('temperatureHigh-circles', 'visibility', 'none');
+    hide: function () {
+        if (map.getLayer('tempDiffHigh-circles')) {
+            map.setLayoutProperty('tempDiffHigh-circles', 'visibility', 'none');
         }
-        if (map.getLayer('temperatureHigh-labels')) {
-            map.setLayoutProperty('temperatureHigh-labels', 'visibility', 'none');
+        if (map.getLayer('tempDiffHigh-labels')) {
+            map.setLayoutProperty('tempDiffHigh-labels', 'visibility', 'none');
         }
-        const container = document.getElementById('temp-high-legend-container');
+        const container = document.getElementById('temp-diff-legend-container');
         if (container) container.style.display = 'none';
     },
-    updateTime: async function(timeStr = undefined) {
-        // 與 temperature.js 類似的時間選擇邏輯
-        const response = await fetch('https://yayacat.exptech.dev/eq/meteor-api/weather/list');
+    updateTime: async function (timeStr = undefined) {
+        const response = await fetch('https://api-1.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await response.json();
-         let targetTime = timeList[timeList.length - 1];
+        let targetTime = timeList[timeList.length - 1];
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
@@ -133,30 +132,23 @@ window.temperatureHighLayer = {
                 String(date.getMinutes()).padStart(2, '0');
         }
 
-        const weatherResponse = await fetch(`https://yayacat.exptech.dev/eq/meteor-api/weather/${targetTime}`);
+        const weatherResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/weather/${targetTime}`);
         const weatherData = await weatherResponse.json();
 
-        const temperatureHighData = weatherData
-            .filter(station => station.daily && station.daily.high && station.daily.high.temperature !== -99)
+        const tempDiffData = weatherData
+            .filter(station =>
+                station.daily &&
+                station.daily.high && station.daily.high.temperature !== -99 &&
+                station.daily.low && station.daily.low.temperature !== -99
+            )
             .map(station => {
-                const date = new Date(station.daily.high.time);
-                const time = date.toLocaleString('zh-TW', {
-                    timeZone: 'Asia/Taipei',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                }).replace(/\//g, '-').replace(',', '');
-
+                const diff = parseFloat((station.daily.high.temperature - station.daily.low.temperature).toFixed(1));
                 return {
                     type: 'Feature',
                     properties: {
                         id: station.id,
                         name: station.station.name,
-                        temperatureHigh: station.daily.high.temperature,
-                        time: time
+                        tempDiff: diff
                     },
                     geometry: {
                         type: 'Point',
@@ -165,46 +157,39 @@ window.temperatureHighLayer = {
                 };
             });
 
-        if (map.getSource('temperatureHigh-data')) {
-            map.getSource('temperatureHigh-data').setData({
+        if (map.getSource('tempDiffHigh-data')) {
+            map.getSource('tempDiffHigh-data').setData({
                 type: 'FeatureCollection',
-                features: temperatureHighData
+                features: tempDiffData
             });
         }
-        updateTempHighLegend(temperatureHighData);
+        updateTempDiffLegend(tempDiffData);
     }
 };
 
-map.on('load', async function() {
+map.on('load', async function () {
     try {
-        const listResponse = await fetch('https://yayacat.exptech.dev/eq/meteor-api/weather/list');
+        const listResponse = await fetch('https://api-1.exptech.dev/api/v2/meteor/weather/list');
         const timeList = await listResponse.json();
         const latestTime = timeList[timeList.length - 1];
 
-        const weatherResponse = await fetch(`https://yayacat.exptech.dev/eq/meteor-api/weather/${latestTime}`);
+        const weatherResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/weather/${latestTime}`);
         const weatherData = await weatherResponse.json();
 
-        const temperatureHighData = weatherData
-            .filter(station => station.daily && station.daily.high && station.daily.high.temperature !== -99)
+        const tempDiffData = weatherData
+            .filter(station =>
+                station.daily &&
+                station.daily.high && station.daily.high.temperature !== -99 &&
+                station.daily.low && station.daily.low.temperature !== -99
+            )
             .map(station => {
-                const date = new Date(station.daily.high.time);
-                const time = date.toLocaleString('zh-TW', {
-                    timeZone: 'Asia/Taipei',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                }).replace(/\//g, '-').replace(',', '');
-
+                const diff = parseFloat((station.daily.high.temperature - station.daily.low.temperature).toFixed(1));
                 return {
                     type: 'Feature',
                     properties: {
                         id: station.id,
                         name: station.station.name,
-                        temperatureHigh: station.daily.high.temperature,
-                        time: time
+                        tempDiff: diff
                     },
                     geometry: {
                         type: 'Point',
@@ -213,20 +198,20 @@ map.on('load', async function() {
                 };
             });
 
-        map.addSource('temperatureHigh-data', {
+        map.addSource('tempDiffHigh-data', {
             type: 'geojson',
             data: {
                 type: 'FeatureCollection',
-                features: temperatureHighData
+                features: tempDiffData
             }
         });
 
-        updateTempHighLegend(temperatureHighData);
+        updateTempDiffLegend(tempDiffData);
 
         map.addLayer({
-            id: 'temperatureHigh-circles',
+            id: 'tempDiffHigh-circles',
             type: 'circle',
-            source: 'temperatureHigh-data',
+            source: 'tempDiffHigh-data',
             layout: {
                 'visibility': 'none'
             },
@@ -241,14 +226,11 @@ map.on('load', async function() {
                 'circle-color': [
                     'interpolate',
                     ['linear'],
-                    ['get', 'temperatureHigh'],
-                    -20, '#4d4e51',
-                    -10, '#0000FF',
-                    0, '#6495ED',
-                    10, '#95d07e',
-                    20, '#f6e78b',
-                    30, '#FF4500',
-                    40, '#8B0000'
+                    ['get', 'tempDiff'],
+                    0, '#ffffff',
+                    5, '#f6e78b',
+                    10, '#FF4500',
+                    15, '#8B0000'
                 ],
                 'circle-opacity': 0.7,
                 'circle-stroke-width': 0.2,
@@ -258,19 +240,17 @@ map.on('load', async function() {
         });
 
         map.addLayer({
-            id: 'temperatureHigh-labels',
+            id: 'tempDiffHigh-labels',
             type: 'symbol',
-            source: 'temperatureHigh-data',
+            source: 'tempDiffHigh-data',
             minzoom: 8.5,
             layout: {
                 'visibility': 'none',
                 'text-field': ['format',
                     ['get', 'name'],
                     '\n',
-                    ['number-format', ['get', 'temperatureHigh'], {'max-fraction-digits': 1}],
-                    '°C',
-                    '\n',
-                    ['get', 'time'],
+                    ['number-format', ['get', 'tempDiff'], { 'max-fraction-digits': 1 }],
+                    '°C'
                 ],
                 'text-size': [
                     'interpolate',
@@ -299,6 +279,6 @@ map.on('load', async function() {
             }
         });
     } catch (e) {
-        console.warn('temperatureHighLayer init failed', e);
+        console.warn('temperatureDiffHighLayer init failed', e);
     }
 });

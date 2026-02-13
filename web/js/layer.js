@@ -65,6 +65,12 @@ class LayerMenu {
                     </svg>
                     最低氣溫
                 </li>
+                <li class="layer-item" data-layer="tempDiffHigh">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
+                        <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
+                    </svg>
+                    (高/低)溫差
+                </li>
                 <li class="layer-item" data-layer="humidity">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M580-240q25 0 42.5-17.5T640-300q0-25-17.5-42.5T580-360q-25 0-42.5 17.5T520-300q0 25 17.5 42.5T580-240Zm-202-2 260-260-56-56-260 260 56 56Zm2-198q25 0 42.5-17.5T440-500q0-25-17.5-42.5T380-560q-25 0-42.5 17.5T320-500q0 25 17.5 42.5T380-440ZM480-80q-137 0-228.5-94T160-408q0-100 79.5-217.5T480-880q161 137 240.5 254.5T800-408q0 140-91.5 234T480-80Zm0-80q104 0 172-70.5T720-408q0-73-60.5-165T480-774Q361-665 300.5-573T240-408q0 107 68 177.5T480-160Zm0-320Z"/>
@@ -153,7 +159,7 @@ class LayerMenu {
                 const layer = item.dataset.layer;
                 const exclusiveGroups = [
                     ['radar', 'radarRain'],
-                    ['temperature', 'tempHigh', 'tempLow'],
+                    ['temperature', 'tempHigh', 'tempLow', 'tempDiffHigh'],
                 ];
 
                 if (this.activeLayers.has(layer)) {
@@ -187,6 +193,7 @@ class LayerMenu {
             temperature: window.temperatureLayer,
             tempHigh: window.temperatureHighLayer,
             tempLow: window.temperatureLowLayer,
+            tempDiffHigh: window.temperatureDiffHighLayer,
             radar: window.radarLayer,
             radarRain: window.radarRainLayer,
             rain: window.rainLayer,
@@ -285,6 +292,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 temperature: window.temperatureLayer,
                 tempHigh: window.temperatureHighLayer,
                 tempLow: window.temperatureLowLayer,
+                tempDiffHigh: window.temperatureDiffHighLayer,
                 humidity: window.humidityLayer,
                 pressure: window.pressureLayer,
                 wind: window.windLayer,
