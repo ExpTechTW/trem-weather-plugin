@@ -1,3 +1,100 @@
+// updateRainLegend: rain statistics & legend
+function updateRainLegend(features) {
+    let container = document.getElementById('rain-legend-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'rain-legend-container';
+        container.className = 'legend-container';
+
+        const header = document.createElement('div');
+        header.className = 'legend-header';
+
+        const title = document.createElement('span');
+        title.className = 'legend-title';
+        title.textContent = '雨量統計 & 圖例';
+
+        const icon = document.createElement('span');
+        icon.id = 'rain-toggle-icon';
+        icon.className = 'legend-toggle-icon';
+        icon.textContent = '▼';
+
+        header.appendChild(title);
+        header.appendChild(icon);
+        header.onclick = function () {
+            const content = document.getElementById('rain-content');
+            const icon = document.getElementById('rain-toggle-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▲';
+            }
+        };
+        container.appendChild(header);
+
+        const content = document.createElement('div');
+        content.id = 'rain-content';
+        container.appendChild(content);
+
+        document.body.appendChild(container);
+    }
+
+    const content = document.getElementById('rain-content');
+    content.features = features;
+    if (!content.sortOrder) content.sortOrder = 'desc';
+    renderRainLegend();
+}
+
+function renderRainLegend() {
+    const content = document.getElementById('rain-content');
+    if (!content || !content.features) return;
+    const features = content.features;
+    const isDesc = content.sortOrder === 'desc';
+
+    // Legend
+    let html = '<div style="margin-bottom: 15px; margin-top: 5px;">';
+    html += '<div style="margin-bottom: 5px; font-weight: bold;">圖例 (mm)</div>';
+    html += '<div style="background: linear-gradient(to right, #c2c2c2 0%, #9cfcff 11%, #059bff 22%, #39ff03 33%, #fffb03 44%, #ff9500 55%, #ff0000 66%, #fb00ff 77%, #960099 88%, #000000 100%); height: 12px; border-radius: 6px; border: 1px solid #555;"></div>';
+    html += '<div style="display: flex; justify-content: space-between; margin-top: 4px; color: #ddd; font-size: 11px;">';
+    html += '<span>0</span><span>10</span><span>50</span><span>200</span><span>500+</span>';
+    html += '</div></div>';
+
+    // Ranking
+    const sorted = [...features]
+        .sort((a, b) => isDesc ? b.properties.rainfall - a.properties.rainfall : a.properties.rainfall - b.properties.rainfall)
+        .slice(0, 20);
+
+    const sortIcon = isDesc ? '▼' : '▲';
+    html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+        <span>雨量排行 (Top 20)</span>
+        <span style="cursor: pointer; padding: 0 5px;" onclick="toggleRainSort()">${sortIcon}</span>
+    </div>`;
+    html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+    sorted.forEach((f, i) => {
+        const p = f.properties;
+        const coords = f.geometry.coordinates;
+        const rankColor = i < 3 ? '#ffeb3b' : '#fff';
+        const rowBg = i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'transparent';
+        html += `<tr style="background: ${rowBg}; cursor: pointer;" onclick="map.flyTo({center: [${coords[0]}, ${coords[1]}], zoom: 12});">
+            <td style="padding: 3px 5px; color: ${rankColor}; width: 25px; text-align: center;">${i + 1}</td>
+            <td style="padding: 3px 5px;">${p.name}</td>
+            <td style="padding: 3px 5px; text-align: right; font-family: monospace;">${p.rainfall.toFixed(1)}</td>
+        </tr>`;
+    });
+    html += '</table>';
+
+    content.innerHTML = html;
+}
+
+window.toggleRainSort = function() {
+    const content = document.getElementById('rain-content');
+    if (content) {
+        content.sortOrder = content.sortOrder === 'desc' ? 'asc' : 'desc';
+        renderRainLegend();
+    }
+};
+
 // 創建雨量圖層控制器
 window.rainLayer = {
     show: function() {
@@ -13,6 +110,8 @@ window.rainLayer = {
         if (map.getLayer('rain-0-labels')) {
             map.setLayoutProperty('rain-0-labels', 'visibility', 'visible');
         }
+        const container = document.getElementById('rain-legend-container');
+        if (container) container.style.display = 'block';
     },
     hide: function() {
         if (map.getLayer('rain-circles')) {
@@ -27,6 +126,8 @@ window.rainLayer = {
         if (map.getLayer('rain-0-labels')) {
             map.setLayoutProperty('rain-0-labels', 'visibility', 'none');
         }
+        const container = document.getElementById('rain-legend-container');
+        if (container) container.style.display = 'none';
     },
     updateTime: async function(interval = 'now', timeStr = undefined) {
         const response = await fetch('https://api-1.exptech.dev/api/v2/meteor/rain/list');
@@ -116,6 +217,7 @@ window.rainLayer = {
             type: 'FeatureCollection',
             features: rainFeatures
         });
+        updateRainLegend(rainFeatures);
     }
 };
 
@@ -325,6 +427,8 @@ map.on('load', async function() {
             features: rainFeatures
         }
     });
+
+    updateRainLegend(rainFeatures);
 
     // 添加雨量為0的圓圈圖層
     map.addLayer({

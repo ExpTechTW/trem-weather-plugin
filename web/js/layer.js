@@ -107,6 +107,7 @@ class LayerMenu {
         this.updateCurrentLayerDisplay();
 
         display.addEventListener('click', () => {
+            this.minimizeLegends();
             display.classList.toggle('active');
             const menu = document.querySelector('.layer-menu');
             if (display.classList.contains('active')) {
@@ -246,6 +247,19 @@ class LayerMenu {
 
     loadActiveLayer() {
         this.updateLayers();
+    }
+
+    minimizeLegends() {
+        const containers = document.querySelectorAll('.legend-container');
+        containers.forEach(container => {
+            const header = container.querySelector('.legend-header');
+            const content = header ? header.nextElementSibling : null;
+            const icon = header ? header.querySelector('.legend-toggle-icon') : null;
+            if (content && content.style.display !== 'none') {
+                content.style.display = 'none';
+                if (icon) icon.textContent = '▲';
+            }
+        });
     }
 }
 

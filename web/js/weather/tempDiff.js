@@ -4,31 +4,22 @@ function updateTempDiffLegend(features) {
     if (!container) {
         container = document.createElement('div');
         container.id = 'temp-diff-legend-container';
-        container.style.cssText = 'position: absolute; bottom: 60px; right: 30px; left: 30px; background: rgba(0, 0, 0, 0.8); color: white; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; width: 220px; z-index: 1000; display: none; font-size: 12px; font-family: "Noto Sans Regular", sans-serif; box-shadow: 0 0 10px rgba(0,0,0,0.5);';
-
-        // Add custom scrollbar styles
-        const style = document.createElement('style');
-        style.textContent = `
-            #temp-diff-legend-container::-webkit-scrollbar {
-                width: 6px;
-            }
-            #temp-diff-legend-container::-webkit-scrollbar-track {
-                background: rgba(0, 0, 0, 0.3);
-                border-radius: 3px;
-            }
-            #temp-diff-legend-container::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 3px;
-            }
-            #temp-diff-legend-container::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.5);
-            }
-        `;
-        container.appendChild(style);
+        container.className = 'legend-container';
 
         const header = document.createElement('div');
-        header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; cursor: pointer; border-bottom: 1px solid #666; padding-bottom: 5px;';
-        header.innerHTML = '<span style="font-weight: bold; font-size: 14px;">溫差統計 & 圖例</span><span id="temp-diff-toggle-icon" style="font-size: 12px;">▼</span>';
+        header.className = 'legend-header';
+
+        const title = document.createElement('span');
+        title.className = 'legend-title';
+        title.textContent = '溫差統計 & 圖例';
+
+        const icon = document.createElement('span');
+        icon.id = 'temp-diff-toggle-icon';
+        icon.className = 'legend-toggle-icon';
+        icon.textContent = '▼';
+
+        header.appendChild(title);
+        header.appendChild(icon);
         header.onclick = function () {
             const content = document.getElementById('temp-diff-content');
             const icon = document.getElementById('temp-diff-toggle-icon');
@@ -50,6 +41,16 @@ function updateTempDiffLegend(features) {
     }
 
     const content = document.getElementById('temp-diff-content');
+    content.features = features;
+    if (!content.sortOrder) content.sortOrder = 'desc';
+    renderTempDiffLegend();
+}
+
+function renderTempDiffLegend() {
+    const content = document.getElementById('temp-diff-content');
+    if (!content || !content.features) return;
+    const features = content.features;
+    const isDesc = content.sortOrder === 'desc';
 
     // Legend
     let html = '<div style="margin-bottom: 15px; margin-top: 5px;">';
@@ -61,10 +62,14 @@ function updateTempDiffLegend(features) {
 
     // Ranking
     const sorted = [...features]
-        .sort((a, b) => b.properties.tempDiff - a.properties.tempDiff)
+        .sort((a, b) => isDesc ? b.properties.tempDiff - a.properties.tempDiff : a.properties.tempDiff - b.properties.tempDiff)
         .slice(0, 20);
 
-    html += '<div style="margin-bottom: 5px; font-weight: bold;">最大溫差排行 (Top 20)</div>';
+    const sortIcon = isDesc ? '▼' : '▲';
+    html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+        <span>最大溫差排行 (Top 20)</span>
+        <span style="cursor: pointer; padding: 0 5px;" onclick="toggleTempDiffSort()">${sortIcon}</span>
+    </div>`;
     html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
     sorted.forEach((f, i) => {
         const p = f.properties;
@@ -81,6 +86,14 @@ function updateTempDiffLegend(features) {
 
     content.innerHTML = html;
 }
+
+window.toggleTempDiffSort = function() {
+    const content = document.getElementById('temp-diff-content');
+    if (content) {
+        content.sortOrder = content.sortOrder === 'desc' ? 'asc' : 'desc';
+        renderTempDiffLegend();
+    }
+};
 
 window.temperatureDiffHighLayer = {
     show: function () {

@@ -1,3 +1,100 @@
+// updateWindLegend: wind speed statistics & legend
+function updateWindLegend(features) {
+    let container = document.getElementById('wind-legend-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'wind-legend-container';
+        container.className = 'legend-container';
+
+        const header = document.createElement('div');
+        header.className = 'legend-header';
+
+        const title = document.createElement('span');
+        title.className = 'legend-title';
+        title.textContent = '風速統計 & 圖例';
+
+        const icon = document.createElement('span');
+        icon.id = 'wind-toggle-icon';
+        icon.className = 'legend-toggle-icon';
+        icon.textContent = '▼';
+
+        header.appendChild(title);
+        header.appendChild(icon);
+        header.onclick = function () {
+            const content = document.getElementById('wind-content');
+            const icon = document.getElementById('wind-toggle-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▲';
+            }
+        };
+        container.appendChild(header);
+
+        const content = document.createElement('div');
+        content.id = 'wind-content';
+        container.appendChild(content);
+
+        document.body.appendChild(container);
+    }
+
+    const content = document.getElementById('wind-content');
+    content.features = features;
+    if (!content.sortOrder) content.sortOrder = 'desc';
+    renderWindLegend();
+}
+
+function renderWindLegend() {
+    const content = document.getElementById('wind-content');
+    if (!content || !content.features) return;
+    const features = content.features;
+    const isDesc = content.sortOrder === 'desc';
+
+    // Legend
+    let html = '<div style="margin-bottom: 15px; margin-top: 5px;">';
+    html += '<div style="margin-bottom: 5px; font-weight: bold;">圖例 (m/s)</div>';
+    html += '<div style="background: linear-gradient(to right, #ffffff 0%, #00ffff 25%, #2979ff 50%, #aa00ff 75%, #ff1744 100%); height: 12px; border-radius: 6px; border: 1px solid #555;"></div>';
+    html += '<div style="display: flex; justify-content: space-between; margin-top: 4px; color: #ddd; font-size: 11px;">';
+    html += '<span>0</span><span>3.4</span><span>8</span><span>13.9</span><span>32.7+</span>';
+    html += '</div></div>';
+
+    // Ranking
+    const sorted = [...features]
+        .sort((a, b) => isDesc ? b.properties.speed - a.properties.speed : a.properties.speed - b.properties.speed)
+        .slice(0, 20);
+
+    const sortIcon = isDesc ? '▼' : '▲';
+    html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+        <span>最大風速排行 (Top 20)</span>
+        <span style="cursor: pointer; padding: 0 5px;" onclick="toggleWindSort()">${sortIcon}</span>
+    </div>`;
+    html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+    sorted.forEach((f, i) => {
+        const p = f.properties;
+        const coords = f.geometry.coordinates;
+        const rankColor = i < 3 ? '#ffeb3b' : '#fff';
+        const rowBg = i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'transparent';
+        html += `<tr style="background: ${rowBg}; cursor: pointer;" onclick="map.flyTo({center: [${coords[0]}, ${coords[1]}], zoom: 12});">
+            <td style="padding: 3px 5px; color: ${rankColor}; width: 25px; text-align: center;">${i + 1}</td>
+            <td style="padding: 3px 5px;">${p.name}</td>
+            <td style="padding: 3px 5px; text-align: right; font-family: monospace;">${p.speed.toFixed(1)}</td>
+        </tr>`;
+    });
+    html += '</table>';
+
+    content.innerHTML = html;
+}
+
+window.toggleWindSort = function() {
+    const content = document.getElementById('wind-content');
+    if (content) {
+        content.sortOrder = content.sortOrder === 'desc' ? 'asc' : 'desc';
+        renderWindLegend();
+    }
+};
+
 // 創建風速圖層控制器
 window.windLayer = {
     show: function() {
@@ -13,6 +110,8 @@ window.windLayer = {
         if (map.getLayer('wind-speed-0-labels')) {
             map.setLayoutProperty('wind-speed-0-labels', 'visibility', 'visible');
         }
+        const container = document.getElementById('wind-legend-container');
+        if (container) container.style.display = 'block';
     },
     hide: function() {
         if (map.getLayer('wind-arrows')) {
@@ -27,6 +126,8 @@ window.windLayer = {
         if (map.getLayer('wind-speed-0-labels')) {
             map.setLayoutProperty('wind-speed-0-labels', 'visibility', 'none');
         }
+        const container = document.getElementById('wind-legend-container');
+        if (container) container.style.display = 'none';
     },
     updateTime: async function(timeStr = undefined) {
         const response = await fetch('https://api-1.exptech.dev/api/v2/meteor/weather/list');
@@ -87,6 +188,7 @@ window.windLayer = {
             type: 'FeatureCollection',
             features: windFeatures
         });
+        updateWindLegend(windFeatures);
     }
 };
 
@@ -315,6 +417,8 @@ map.on('load', async function() {
             features: windFeatures
         }
     });
+
+    updateWindLegend(windFeatures);
 
     // 添加風速為0的圓圈圖層
     map.addLayer({

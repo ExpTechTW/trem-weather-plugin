@@ -1,3 +1,100 @@
+// updateHumidityLegend: humidity statistics & legend
+function updateHumidityLegend(features) {
+    let container = document.getElementById('humidity-legend-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'humidity-legend-container';
+        container.className = 'legend-container';
+
+        const header = document.createElement('div');
+        header.className = 'legend-header';
+
+        const title = document.createElement('span');
+        title.className = 'legend-title';
+        title.textContent = '濕度統計 & 圖例';
+
+        const icon = document.createElement('span');
+        icon.id = 'humidity-toggle-icon';
+        icon.className = 'legend-toggle-icon';
+        icon.textContent = '▼';
+
+        header.appendChild(title);
+        header.appendChild(icon);
+        header.onclick = function () {
+            const content = document.getElementById('humidity-content');
+            const icon = document.getElementById('humidity-toggle-icon');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▲';
+            }
+        };
+        container.appendChild(header);
+
+        const content = document.createElement('div');
+        content.id = 'humidity-content';
+        container.appendChild(content);
+
+        document.body.appendChild(container);
+    }
+
+    const content = document.getElementById('humidity-content');
+    content.features = features;
+    if (!content.sortOrder) content.sortOrder = 'desc';
+    renderHumidityLegend();
+}
+
+function renderHumidityLegend() {
+    const content = document.getElementById('humidity-content');
+    if (!content || !content.features) return;
+    const features = content.features;
+    const isDesc = content.sortOrder === 'desc';
+
+    // Legend
+    let html = '<div style="margin-bottom: 15px; margin-top: 5px;">';
+    html += '<div style="margin-bottom: 5px; font-weight: bold;">圖例 (%)</div>';
+    html += '<div style="background: linear-gradient(to right, #ffb63d 0%, #ffffff 50%, #0000FF 100%); height: 12px; border-radius: 6px; border: 1px solid #555;"></div>';
+    html += '<div style="display: flex; justify-content: space-between; margin-top: 4px; color: #ddd; font-size: 11px;">';
+    html += '<span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>';
+    html += '</div></div>';
+
+    // Ranking
+    const sorted = [...features]
+        .sort((a, b) => isDesc ? b.properties.humidity - a.properties.humidity : a.properties.humidity - b.properties.humidity)
+        .slice(0, 20);
+
+    const sortIcon = isDesc ? '▼' : '▲';
+    html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+        <span>濕度排行 (Top 20)</span>
+        <span style="cursor: pointer; padding: 0 5px;" onclick="toggleHumiditySort()">${sortIcon}</span>
+    </div>`;
+    html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+    sorted.forEach((f, i) => {
+        const p = f.properties;
+        const coords = f.geometry.coordinates;
+        const rankColor = i < 3 ? '#ffeb3b' : '#fff';
+        const rowBg = i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'transparent';
+        html += `<tr style="background: ${rowBg}; cursor: pointer;" onclick="map.flyTo({center: [${coords[0]}, ${coords[1]}], zoom: 12});">
+            <td style="padding: 3px 5px; color: ${rankColor}; width: 25px; text-align: center;">${i + 1}</td>
+            <td style="padding: 3px 5px;">${p.name}</td>
+            <td style="padding: 3px 5px; text-align: right; font-family: monospace;">${p.humidity}</td>
+        </tr>`;
+    });
+    html += '</table>';
+
+    content.innerHTML = html;
+}
+
+window.toggleHumiditySort = function() {
+    const content = document.getElementById('humidity-content');
+    if (content) {
+        content.sortOrder = content.sortOrder === 'desc' ? 'asc' : 'desc';
+        renderHumidityLegend();
+    }
+};
+
 // 創建濕度圖層控制器
 window.humidityLayer = {
     show: function() {
@@ -7,6 +104,8 @@ window.humidityLayer = {
         if (map.getLayer('humidity-labels')) {
             map.setLayoutProperty('humidity-labels', 'visibility', 'visible');
         }
+        const container = document.getElementById('humidity-legend-container');
+        if (container) container.style.display = 'block';
     },
     hide: function() {
         if (map.getLayer('humidity-circles')) {
@@ -15,6 +114,8 @@ window.humidityLayer = {
         if (map.getLayer('humidity-labels')) {
             map.setLayoutProperty('humidity-labels', 'visibility', 'none');
         }
+        const container = document.getElementById('humidity-legend-container');
+        if (container) container.style.display = 'none';
     },
     updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
@@ -83,6 +184,7 @@ window.humidityLayer = {
                 type: 'FeatureCollection',
                 features: humidityFeatures
             });
+            updateHumidityLegend(humidityFeatures);
         } catch (error) {
             console.error('濕度資料載入失敗:', error);
         }
@@ -288,6 +390,8 @@ map.on('load', async function() {
             features: humidityFeatures
         }
     });
+
+    updateHumidityLegend(humidityFeatures);
 
     // 添加濕度圓圈圖層
     map.addLayer({
