@@ -1,9 +1,9 @@
 {
-  "timestamp": 1770975904618,
-  "version": "1.9.0",
+  "timestamp": 1779676813175,
+  "version": "1.9.1",
   "fileHashes": {
     "index.js": "85fe541d2d9f2c7dc22fcfb7922fce7683107b8104d2b4caeb03c97511a94946",
-    "info.json": "3eb29da25ee6e3deb192d02b5d29bf0fcbf39759dc25b6e3a9ce277f994df2a7",
+    "info.json": "47feb82cbc8b8ca7ff664206ef17c60b8f329fe0fb2c419f6ef44b4a1477c0ea",
     "web/css/chart.css": "4b0c96e5121662ad90a283a79def3b7c337dc0695c4f58b4788fb8fa3db419b3",
     "web/css/color.css": "576e37a735999274264364b44f5d37698e8b7eced1779a5346e3809aca9d2239",
     "web/css/globals.css": "7050c32820c63f2c564588fe8597a356e6d456968d309c09a6fc32d3e41f199b",
@@ -37,11 +37,11 @@
     "web/js/weather/rain.js": "2a87a27e3e9dbd9e3e737d29d039a49dbb4ca77d086f4574dafb1c0a6185f8fd",
     "web/js/weather/tempDiff.js": "ac3e640fa39ea4507ba6fe6c5d1d3d99b2036ea3b6f3fa3e0a767f1d6fba42b3",
     "web/js/weather/temperature.js": "55e32354cb476162da772f5caf00680f63fd16c6fd702be3936c3a8eb36ebff1",
-    "web/js/weather/temphigh.js": "6a233ec0ee8394134cafeb6f276fcfd9efb57483a569abe7e84a140c44bcb53d",
+    "web/js/weather/temphigh.js": "6f2b5159c55ad7fc3fa96120b28acd5fe7a5f91928b6d58fd61bef33fe1442a6",
     "web/js/weather/templow.js": "52abfd0c7ee520044c1139160736330b1bdf8bc6ed4f6821c066c2688b9b3217",
     "web/js/weather/wind.js": "1137f01de4ec04f655212f1213dc089c5c0e10014345bbaae501e3b2323af54d",
     "web/weather.html": "e3d18a7d14892d358f2103c20b2450fc558c496dd49aa7a85e2213f50bac6c0b"
   },
-  "signature": "vgUhjTHuk+omnAcb7It1uJnWCi4sCf8MJHEWJOXi1xxjLl+/pmcY2nP3LfNN5s0AX1NOJZcoNwJjhRx97bz0OvSvGuFbb0ar56UiFUbPxVjzpcv9tpdV2XgYJJeIkN192UWAZe24gqP7Xe01duYEjRRG0y/ieP9sZfWyAKfLt47C1gD6YRsiZuF2esmLvuaXnlDV1VhXXlHRQPQMlGEI0nKDacOR8y1ri5tFNOvd+InHwRXIbDuNEa7e1WzCCgL+6MjOyHaeMsbOc30GoLANKUBhi0xpHbe9Ww+ZUwj43ZAFFHiJbSr7K32ybu0SwKRm164e7EWHCVpu3lY4JVG6xQ==",
+  "signature": "D8plSGgXHbH256IhfEr9gDC/fYrF1hEecXbFRyfIDNzj47p88Ew2MOq3bZQJJ03unllpXIo0xTrerW0RN0bbtFpkiU1UNf13hnBQL9PVujiwOW7VKgMcP3aP5xbKTWm0uNAesO7wBkJlKK/NyFMnFkKHdOnrkrGbudDv9eQ/wHHD1v0m9Wox2fMbZ7IgI7TPpQhcWC7S5G4ZOOwoSNd7CR1ugccmhu6L9ADOyKWX3c6yLBsxUttF0e3ptfS/eSC4jmNyYaoQDYBDIGUb2DvtpeNU2JRAcxcdcrS4ya7RBH4XXBC/MY0jn0aSKS0fIWtY0CbJ+kRiIcn/55gv/OnlIA==",
   "keyId": "official"
 }
