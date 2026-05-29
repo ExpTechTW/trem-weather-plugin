@@ -1,4 +1,10 @@
 // 創建閃電圖層控制器
+// 讓 setTimeList 和 updateTime 共享 timeList
+let timeList;
+
+// 設定 lightning 自己的最新時間列表（給 resetTime 用）
+let setTimeList;
+
 window.lightningLayer = {
     show: function() {
         if (map.getLayer('lightning-markers')) {
@@ -13,26 +19,31 @@ window.lightningLayer = {
     updateTime: async function(timeStr = undefined) {
         // 獲取時間列表
         const timeListResponse = await fetch('https://api-1.exptech.dev/api/v2/meteor/lightning/list');
-        const timeList = await timeListResponse.json();
+        const fetchedList = await timeListResponse.json();
 
-        let time = timeList[0];
+        let time;
 
         if (timeStr) {
             const target = timeStr.replace(/-/g, '/');
             const inputDate = new Date(target);
             let minDiff = Infinity;
-            for (const t of timeList) {
-                const d = new Date(parseInt(t));
+            for (const t of fetchedList) {
+                const d = new Date(Number(t));
                 const diff = Math.abs(d.getTime() - inputDate.getTime());
                 if (diff < minDiff) {
                     minDiff = diff;
                     time = t;
                 }
             }
+        } else {
+            // 沒有傳入 timeStr 時，優先用已存的 timeList（resetTime 用）
+            timeList = fetchedList;
+            // lightning/list 最後一個是最新
+            time = timeList[timeList.length - 1];
         }
 
         const timeDisplay = document.getElementById('time-display');
-        const date = new Date(parseInt(time));
+        const date = new Date(Number(time));
         timeDisplay.textContent = date.getFullYear() + '-' +
             String(date.getMonth() + 1).padStart(2, '0') + '-' +
             String(date.getDate()).padStart(2, '0') + ' ' +
@@ -123,6 +134,9 @@ map.on('load', async function() {
     const lightningResponse = await fetch(`https://api-1.exptech.dev/api/v2/meteor/lightning/${latestTime}`);
     const lightningData = await lightningResponse.json();
 
+    // 設定 lightning 自己的 timeList（給 resetTime 和 updateTime 用）
+    setTimeList = (list) => { timeList = list; };
+
     const lightningFeatures = lightningData
         .map(lightning => {
             const type = lightning.type;
@@ -186,7 +200,7 @@ map.on('load', async function() {
 
 
     const timeDisplay = document.getElementById('time-display');
-    const date = new Date(parseInt(latestTime));
+    const date = new Date(Number(latestTime));
     timeDisplay.textContent = date.getFullYear() + '-' +
         String(date.getMonth() + 1).padStart(2, '0') + '-' +
         String(date.getDate()).padStart(2, '0') + ' ' +
