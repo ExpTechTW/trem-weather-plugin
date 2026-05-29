@@ -1,9 +1,9 @@
 {
-  "timestamp": 1780016726951,
-  "version": "1.9.1",
+  "timestamp": 1780017295150,
+  "version": "1.9.2",
   "fileHashes": {
     "index.js": "85fe541d2d9f2c7dc22fcfb7922fce7683107b8104d2b4caeb03c97511a94946",
-    "info.json": "47feb82cbc8b8ca7ff664206ef17c60b8f329fe0fb2c419f6ef44b4a1477c0ea",
+    "info.json": "6f66243389e620ea28e33068308861dc3bb0301e4920b971f6b74536e8ea5454",
     "web/css/chart.css": "4b0c96e5121662ad90a283a79def3b7c337dc0695c4f58b4788fb8fa3db419b3",
     "web/css/color.css": "576e37a735999274264364b44f5d37698e8b7eced1779a5346e3809aca9d2239",
     "web/css/globals.css": "7050c32820c63f2c564588fe8597a356e6d456968d309c09a6fc32d3e41f199b",
@@ -42,6 +42,6 @@
     "web/js/weather/wind.js": "1137f01de4ec04f655212f1213dc089c5c0e10014345bbaae501e3b2323af54d",
     "web/weather.html": "e3d18a7d14892d358f2103c20b2450fc558c496dd49aa7a85e2213f50bac6c0b"
   },
-  "signature": "t70PRN952LFxFB/Fn0YwxFvkMetXQzEOGybbznTp8o57N81FtG9fY8ny3U5Ozt4y8xh8jkmbWbbzyuInCdBR/xYUIRIhzm/LRXb4AEi9TJX6ezavh7HPl1WpeY62Z9Ur9GG7GW2lhsZoiMcDsGtAUJT1KWXJEMw3m1PkQaZBmqo7WiVw/4clofOn+ca4+BHcWgmVs7IGdUYz813BaiCDSVim/k24Mlq3fhULNX0ETB/AHYQQkj5M256yoS2qoW+hGszAUEkfRyafON9UrxAo/cGYSSK51v0z6BoaGe1hGR9cd7OYpIwS79KXLz+bSlBnHAZ13x8WBpMtDzEgI3/Mqg==",
+  "signature": "ZpdAGmi24cUT+bs1ReTjTitFV9EFJtbimu6Ejq690h/z4pZKDcTBoRD9J8TU3fkM5z/DfpWKtbM6oakVCe2L+aSkqKM2fpCuf6B3Q9LMbWw4Q7SDMPYa61pIsj5q/fenDRYZjFW6LcNbsGPldoaB8JI6+4chwOuwBy4iewyXHGLm7wCewE3NPS+i0GX4n9BHyh2WZ4QIgrxT1u3mj4P91kM4UpHEe0R4KC+NJhAh3xUFT/NECZUUGKcbE46xGW1LJZbh7eKRZtWu8ukyTe1Ni/8VYR/g5cWv1IUwYcQPQTqkY1rnCHAaDAMxkg/s6hly3iZtxGbk+oBhwzH9/e3wow==",
   "keyId": "official"
 }
