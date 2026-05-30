@@ -152,7 +152,7 @@ function createRainfallLegendContainer() {
     if (!container) {
         container = document.createElement('div');
         container.id = 'rainfall-legend-container';
-        container.style.cssText = 'background: #1e1e1e; color: #e0e0e0; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; width: 280px; max-height: 400px; overflow-y: auto;';
+        container.style.cssText = 'background: #1e1e1e; color: #e0e0e0; border-radius: 8px; padding: 10px 12px; width: 280px; max-height: 400px; overflow-y: auto; position: fixed; bottom: 10px; left: 10px; z-index: 999;';
 
         const header = document.createElement('div');
         header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 6px;';
@@ -174,6 +174,13 @@ function createRainfallLegendContainer() {
         content.id = 'rainfall-legend-content';
         content.style.cssText = 'overflow: hidden;';
         container.appendChild(content);
+
+        // 雨量資訊元素
+        const info = document.createElement('div');
+        info.id = 'rainfall-city-info';
+        info.style.cssText = 'padding: 6px 0; font-size: 12px; color: #ccc; border-top: 1px solid #333; margin-top: 6px;';
+        info.textContent = '共 0 個區域';
+        container.appendChild(info);
 
         document.body.appendChild(container);
     }
@@ -315,4 +322,6 @@ map.on('load', async function () {
 
     // 預設顯示
     window.rainfallLayer.show();
+    updateRainfallLegend(features);
+    updateRainfallCityInfo(data);
 });
