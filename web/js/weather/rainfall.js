@@ -320,8 +320,8 @@ map.on('load', async function () {
         map.getCanvas().style.cursor = '';
     });
 
-    // 預設顯示
-    window.rainfallLayer.show();
+    // 初始載入，預設隱藏
+    // window.rainfallLayer.show();
     updateRainfallLegend(features);
     updateRainfallCityInfo(data);
 });
