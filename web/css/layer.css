@@ -141,3 +141,118 @@
     border-top: 1px solid #3a3b40;
     display: none;
 }
+/* ── 圖層群組結構 ── */
+.layer-group {
+    width: 100%;
+}
+
+.layer-group .layer-group-parent {
+    border-bottom: 1px solid #2a2b30;
+}
+
+.layer-group .layer-group-parent .group-arrow {
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    transition: transform 0.15s;
+}
+
+.layer-group .layer-group-parent.active .group-arrow {
+    transform: rotate(90deg);
+}
+
+.layer-group-children {
+    list-style: none;
+    margin: 0;
+    padding: 0 16px 0 36px;
+}
+
+.layer-group .layer-group-child {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #1a1b20;
+}
+
+.layer-group .layer-group-child:last-child {
+    border-bottom: none;
+}
+
+.layer-group .layer-group-child:first-child {
+    padding-top: 8px;
+}
+
+.layer-group .layer-group-child:last-child {
+    padding-bottom: 8px;
+}
+
+.layer-group .layer-group-child.active {
+    background-color: #3a3b40;
+}
+
+.layer-group .layer-group-child.active svg {
+    fill: #4fc3f7;
+}
+
+/* 群組子項的圓角 */
+.layer-group .layer-group-children:first-child {
+    border-radius: 0 0 8px 8px;
+}
+
+
+/* ── 溫度群組 ── */
+.layer-group.parent {
+    padding: 12px 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.layer-group.parent:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.layer-group.parent:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+.layer-group.parent > .group-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.layer-group.parent.active > .group-arrow {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.layer-group-children {
+    margin: 0;
+    list-style: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+}
+
+.layer-group.active > .layer-group-children {
+    max-height: 500px;
+}
+
+.layer-group-children .layer-item {
+    padding-left: 44px;
+    font-size: 13px;
+}
+
+.layer-group-children .layer-item:first-child {
+    border-radius: 0;
+}
+
+.layer-group-children .layer-item:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+/* 群組內第一個子項目頂部不留空隙 */
+.layer-group-children .layer-item {
+    margin-top: 2px;
+}

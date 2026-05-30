@@ -47,31 +47,35 @@ class LayerMenu {
                         <option value="3d">3 天</option>
                     </select>
                 </div>
-                
-                <li class="layer-item" data-layer="temperature">
+                <li class="layer-item layer-group parent" data-layer="temperature">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
                     </svg>
-                    氣溫
-                </li>
-                <li class="layer-item" data-layer="tempHigh">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
-                        <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
+                    氣氣
+                    <svg class="group-arrow" xmlns="http://www.w3.org/2000/svg" height="14px" width="14px" viewBox="0 0 24 24" fill="#aaa">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                     </svg>
-                    最高氣溫
                 </li>
-                <li class="layer-item" data-layer="tempLow">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
-                        <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
-                    </svg>
-                    最低氣溫
-                </li>
-                <li class="layer-item" data-layer="tempDiffHigh">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
-                        <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
-                    </svg>
-                    (高/低)溫差
-                </li>
+                <ul class="layer-group-children" data-parent="temperature">
+                    <li class="layer-item" data-layer="tempHigh">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
+                            <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
+                        </svg>
+                        最高氣溫
+                    </li>
+                    <li class="layer-item" data-layer="tempLow">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
+                            <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
+                        </svg>
+                        最低氣溫
+                    </li>
+                    <li class="layer-item" data-layer="tempDiffHigh">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e3e3e3">
+                            <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
+                        </svg>
+                        (高/低)溫差
+                    </li>
+                </ul>
                 <li class="layer-item" data-layer="humidity">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M580-240q25 0 42.5-17.5T640-300q0-25-17.5-42.5T580-360q-25 0-42.5 17.5T520-300q0 25 17.5 42.5T580-240Zm-202-2 260-260-56-56-260 260 56 56Zm2-198q25 0 42.5-17.5T440-500q0-25-17.5-42.5T380-560q-25 0-42.5 17.5T320-500q0 25 17.5 42.5T380-440ZM480-80q-137 0-228.5-94T160-408q0-100 79.5-217.5T480-880q161 137 240.5 254.5T800-408q0 140-91.5 234T480-80Zm0-80q104 0 172-70.5T720-408q0-73-60.5-165T480-774Q361-665 300.5-573T240-408q0 107 68 177.5T480-160Zm0-320Z"/>
@@ -128,7 +132,6 @@ class LayerMenu {
                         <option value="澎湖縣">澎湖縣</option>
                         <option value="金門縣">金門縣</option>
                         <option value="連江縣">連江縣</option>
-                    
                         <option value="大安區">大安區</option>
                         <option value="士林區">士林區</option>
                         <option value="內湖區">內湖區</option>
@@ -186,7 +189,7 @@ class LayerMenu {
                 if (layerItem) {
                     const icon = layerItem.querySelector('svg').cloneNode(true);
                     var text = '';
-                    layerItem.childNodes.forEach(function(node) {
+                    layerItem.childNodes.forEach(function (node) {
                         if (node.nodeType === 3 && node.textContent.trim()) {
                             text += node.textContent.trim();
                         }
@@ -207,35 +210,101 @@ class LayerMenu {
         const display = document.querySelector('.current-layer-display');
 
         layerItems.forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                // Stop propagation if clicking on a parent item's arrow
+                if (e.target.classList.contains('group-arrow')) {
+                    e.stopPropagation();
+                }
+
                 const layer = item.dataset.layer;
                 const exclusiveGroups = [
                     ['radar', 'radarRain'],
                     ['temperature', 'tempHigh', 'tempLow', 'tempDiffHigh'],
                 ];
 
-                if (this.activeLayers.has(layer)) {
-                    this.activeLayers.delete(layer);
-                    item.classList.remove('active');
-                } else {
-                    this.activeLayers.add(layer);
-                    item.classList.add('active');
+                // Check if this is a child item of a group
+                const parentGroup = item.closest('.layer-group.parent');
+                const isParentItem = parentGroup && item.classList.contains('parent');
+                const groupLayer = parentGroup ? parentGroup.dataset.layer : null;
 
-                    const group = exclusiveGroups.find(g => g.includes(layer));
-                    if (group) {
-                        group.forEach(layerInGroup => {
-                            if (layerInGroup !== layer && this.activeLayers.has(layerInGroup)) {
-                                this.activeLayers.delete(layerInGroup);
-                                const itemToDeactivate = document.querySelector(`[data-layer="${layerInGroup}"]`);
-                                if (itemToDeactivate) {
-                                    itemToDeactivate.classList.remove('active');
-                                }
-                            }
+                if (isParentItem) {
+                    // Toggle all children of this group
+                    const childLayers = parentGroup.dataset.children
+                        ? JSON.parse(parentGroup.dataset.children)
+                        : groupLayer
+                            ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer)
+                            : [];
+
+                    const allChildrenActive = childLayers.every(l => this.activeLayers.has(l));
+
+                    if (allChildrenActive) {
+                        // Deselect all
+                        childLayers.forEach(l => {
+                            this.activeLayers.delete(l);
+                            const childEl = document.querySelector(`[data-layer="${l}"]`);
+                            if (childEl) childEl.classList.remove('active');
                         });
+                        item.classList.remove('active');
+                    } else {
+                        // Select all
+                        childLayers.forEach(l => {
+                            this.activeLayers.add(l);
+                            const childEl = document.querySelector(`[data-layer="${l}"]`);
+                            if (childEl) childEl.classList.add('active');
+                        });
+                        item.classList.add('active');
                     }
-                }
+                    this.updateLayers();
+                } else if (item.classList.contains('child')) {
+                    // Child item clicked
+                    if (this.activeLayers.has(layer)) {
+                        this.activeLayers.delete(layer);
+                        item.classList.remove('active');
+                    } else {
+                        this.activeLayers.add(layer);
+                        item.classList.add('active');
+                    }
 
-                this.updateLayers();
+                    // Update parent state
+                    if (parentGroup) {
+                        const childLayers = parentGroup.dataset.children
+                            ? JSON.parse(parentGroup.dataset.children)
+                            : groupLayer
+                                ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer)
+                                : [];
+
+                        const someActive = childLayers.some(l => this.activeLayers.has(l));
+                        if (someActive) {
+                            parentGroup.classList.add('active');
+                        } else {
+                            parentGroup.classList.remove('active');
+                        }
+                    }
+                    this.updateLayers();
+                } else {
+                    // Regular item (not parent, not child)
+                    if (this.activeLayers.has(layer)) {
+                        this.activeLayers.delete(layer);
+                        item.classList.remove('active');
+                    } else {
+                        this.activeLayers.add(layer);
+                        item.classList.add('active');
+
+                        const group = exclusiveGroups.find(g => g.includes(layer));
+                        if (group) {
+                            group.forEach(layerInGroup => {
+                                if (layerInGroup !== layer && this.activeLayers.has(layerInGroup)) {
+                                    this.activeLayers.delete(layerInGroup);
+                                    const itemToDeactivate = document.querySelector(`[data-layer="${layerInGroup}"]`);
+                                    if (itemToDeactivate) {
+                                        itemToDeactivate.classList.remove('active');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    this.updateLayers();
+                }
             });
         });
     }
@@ -324,7 +393,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.layerMenu = new LayerMenu();
 
     // 監聽 timeSelector 和 interval-selector 變更
-    document.addEventListener('change', function(e) {
+    document.addEventListener('change', function (e) {
         if (e.target && (e.target.id === 'time-selector' || e.target.id === 'interval-selector')) {
             let timeStr;
             // If time-selector triggered the change, use its value
