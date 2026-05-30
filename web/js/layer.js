@@ -47,6 +47,7 @@ class LayerMenu {
                         <option value="3d">3 天</option>
                     </select>
                 </div>
+                
                 <li class="layer-item" data-layer="temperature">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
@@ -95,6 +96,51 @@ class LayerMenu {
                     </svg>
                     閃電
                 </li>
+                <li class="layer-item" data-layer="rainfall">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                        <path d="M120-240h400l-60-80H120q-33 0-56.5-23.5T40-480q0-33 23.5-56.5T120-560q17 0 33 6l243-170q-25-22-42-52t-25-65H40q-33 0-56.5-23.5T-40-840v-40q0-33 23.5-56.5T40-960h200q16 0 31 6t28 17l160 137q12 10 30 10t30-10l160-137q13-11 28-17t31-6h200q33 0 56.5 23.5T840-880q0 33-23.5 56.5T760-800h-141q-8 35-25 65t-42 52l243 170q16-6 33-6 33 0 56.5 23.5T880-480q0 33-23.5 56.5T800-400H440l60 80-60 80h400l60 80-60 80H120l-60-80 60-80Zm237 0 123-240H357Z"/>
+                    </svg>
+                    雨量預測
+                </li>
+                <div class="rainfall-city-container" style="display:none; padding: 0 10px 10px;">
+                    <span style="color:#aaa;font-size:12px;margin-bottom:4px;display:block;">縣市：</span>
+                    <select id="rainfall-city-dropdown" onchange="if(window.rainfallLayer) window.rainfallLayer.updateTime(this.value)" style="background:#2c2d32;color:#e0e0e0;border:1px solid #555;border-radius:4px;padding:4px 10px;font-size:0.9rem;cursor:pointer;width:100%;">
+                        <option value="" selected>全部縣市</option>
+                        <option value="臺北市">臺北市</option>
+                        <option value="新北市">新北市</option>
+                        <option value="桃園市">桃園市</option>
+                        <option value="臺中市">臺中市</option>
+                        <option value="臺南市">臺南市</option>
+                        <option value="高雄市">高雄市</option>
+                        <option value="基隆市">基隆市</option>
+                        <option value="新竹市">新竹市</option>
+                        <option value="新竹縣">新竹縣</option>
+                        <option value="宜蘭縣">宜蘭縣</option>
+                        <option value="苗栗縣">苗栗縣</option>
+                        <option value="彰化縣">彰化縣</option>
+                        <option value="南投縣">南投縣</option>
+                        <option value="雲林縣">雲林縣</option>
+                        <option value="嘉義縣">嘉義縣</option>
+                        <option value="嘉義市">嘉義市</option>
+                        <option value="屏東縣">屏東縣</option>
+                        <option value="花蓮縣">花蓮縣</option>
+                        <option value="臺東縣">臺東縣</option>
+                        <option value="澎湖縣">澎湖縣</option>
+                        <option value="金門縣">金門縣</option>
+                        <option value="連江縣">連江縣</option>
+                    
+                        <option value="大安區">大安區</option>
+                        <option value="士林區">士林區</option>
+                        <option value="內湖區">內湖區</option>
+                        <option value="中正區">中正區</option>
+                        <option value="信義區">信義區</option>
+                        <option value="萬華區">萬華區</option>
+                        <option value="北投區">北投區</option>
+                        <option value="松山區">松山區</option>
+                        <option value="中山區">中山區</option>
+                        <option value="文山區">文山區</option>
+                        <option value="南港區">南港區</option></select>
+                </div>
             </ul>
         `;
         document.body.appendChild(menu);
@@ -139,7 +185,12 @@ class LayerMenu {
                 const layerItem = document.querySelector(`[data-layer="${layer}"]`);
                 if (layerItem) {
                     const icon = layerItem.querySelector('svg').cloneNode(true);
-                    const text = layerItem.textContent.trim();
+                    var text = '';
+                    layerItem.childNodes.forEach(function(node) {
+                        if (node.nodeType === 3 && node.textContent.trim()) {
+                            text += node.textContent.trim();
+                        }
+                    });
                     display.innerHTML = '';
                     display.appendChild(icon);
                     display.appendChild(document.createTextNode(text));
@@ -198,6 +249,7 @@ class LayerMenu {
             radar: window.radarLayer,
             radarRain: window.radarRainLayer,
             rain: window.rainLayer,
+            rainfall: window.rainfallLayer,
             humidity: window.humidityLayer,
             pressure: window.pressureLayer,
             wind: window.windLayer,
@@ -230,6 +282,11 @@ class LayerMenu {
         const intervalContainer = document.querySelector('.time-interval-container');
         if (intervalContainer) {
             intervalContainer.style.display = this.activeLayers.has('rain') ? 'block' : 'none';
+        }
+
+        const rainfallCityContainer = document.querySelector('.rainfall-city-container');
+        if (rainfallCityContainer) {
+            rainfallCityContainer.style.display = this.activeLayers.has('rainfall') ? 'block' : 'none';
         }
 
         this.updateCurrentLayerDisplay();
@@ -303,6 +360,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 rain: {
                     updateTime: (time) => window.rainLayer.updateTime(interval, time)
                 },
+                rainfall: window.rainfallLayer,
                 temperature: window.temperatureLayer,
                 tempHigh: window.temperatureHighLayer,
                 tempLow: window.temperatureLowLayer,
