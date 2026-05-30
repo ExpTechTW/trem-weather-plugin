@@ -18,7 +18,7 @@ window.rainfallLayer = {
         }
         const legend = document.getElementById('rainfall-legend-container');
         if (legend) legend.style.display = 'block';
-        const city = document.getElementById('rainfall-city-dropdown');
+        const city = document.querySelector('.rainfall-city-container');
         if (city) city.style.display = 'block';
     },
     hide: function () {
