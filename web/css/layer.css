@@ -189,7 +189,7 @@
 }
 
 /* 群組子項的圓角 */
-.layer-group .layer-group-children:first-child {
+.layer-group .layer-group-children:nth-child(1) {
     border-radius: 0 0 8px 8px;
 }
 
@@ -231,7 +231,7 @@
     transition: max-height 0.3s ease;
 }
 
-.layer-group.active > .layer-group-children {
+.layer-group.active ~ .layer-group-children {
     max-height: 500px;
 }
 
