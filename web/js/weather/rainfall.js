@@ -152,7 +152,7 @@ function createRainfallLegendContainer() {
     if (!container) {
         container = document.createElement('div');
         container.id = 'rainfall-legend-container';
-        container.style.cssText = 'background: #1e1e1e; color: #e0e0e0; border-radius: 8px; padding: 10px 12px; width: 280px; max-height: 400px; overflow-y: auto; position: fixed; bottom: 65px; left: 10px; z-index: 999;';
+        container.style.cssText = 'background: #1e1e1e; color: #e0e0e0; border-radius: 8px; padding: 10px 12px; width: 280px; max-height: 400px; overflow-y: auto; position: fixed; bottom: 65px; left: 10px; z-index: 999; display: none;';
 
         const header = document.createElement('div');
         header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 6px;';
