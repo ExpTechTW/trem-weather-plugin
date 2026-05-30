@@ -51,7 +51,7 @@ class LayerMenu {
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M480-120q-83 0-141.5-58.5T280-320q0-48 21-89.5t59-70.5v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q38 29 59 70.5t21 89.5q0 83-58.5 141.5T480-120Zm0-80q50 0 85-35t35-85q0-29-12.5-54T552-416l-32-24v-280q0-17-11.5-28.5T480-760q-17 0-28.5 11.5T440-720v280l-32 24q-23 17-35.5 42T360-320q0 50 35 85t85 35Zm0-120Z"/>
                     </svg>
-                    氣氣
+                    氣溫
                     <svg class="group-arrow" xmlns="http://www.w3.org/2000/svg" height="14px" width="14px" viewBox="0 0 24 24" fill="#aaa">
                         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                     </svg>
@@ -228,33 +228,21 @@ class LayerMenu {
                 const groupLayer = parentGroup ? parentGroup.dataset.layer : null;
 
                 if (isParentItem) {
-                    // Toggle all children of this group
-                    const childLayers = parentGroup.dataset.children
-                        ? JSON.parse(parentGroup.dataset.children)
-                        : groupLayer
-                            ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer)
-                            : [];
+                    // Toggle active state of children elements for visual expand/collapse
+                    const childItems = parentGroup.querySelectorAll('.layer-item');
+                    const anyChildActive = Array.from(childItems).some(el => el.classList.contains('active'));
 
-                    const allChildrenActive = childLayers.every(l => this.activeLayers.has(l));
-
-                    if (allChildrenActive) {
-                        // Deselect all
-                        childLayers.forEach(l => {
-                            this.activeLayers.delete(l);
-                            const childEl = document.querySelector(`[data-layer="${l}"]`);
-                            if (childEl) childEl.classList.remove('active');
-                        });
+                    if (anyChildActive) {
+                        // Collapse: remove active from all children, remove active from parent
+                        childItems.forEach(el => el.classList.remove('active'));
                         item.classList.remove('active');
                     } else {
-                        // Select all
-                        childLayers.forEach(l => {
-                            this.activeLayers.add(l);
-                            const childEl = document.querySelector(`[data-layer="${l}"]`);
-                            if (childEl) childEl.classList.add('active');
-                        });
+                        // Expand: add active to all children, add active to parent
+                        childItems.forEach(el => el.classList.add('active'));
                         item.classList.add('active');
                     }
-                    this.updateLayers();
+                    // Don't call updateLayers() — parent click only toggles visual, not layer activation
+                    return;
                 } else if (item.classList.contains('child')) {
                     // Child item clicked
                     if (this.activeLayers.has(layer)) {
