@@ -1,3 +1,7 @@
+.maplibregl-popup-content {
+    background-color: transparent;
+}
+
 .legend-container {
     position: absolute;
     bottom: 45px;

@@ -1,6 +1,35 @@
 const weatherCache = new Map();
 const rainCache = new Map();
 
+// ── Region lookup (code → 完整地區名) ──
+const RegionLookup = (() => {
+    let cache = new Map();
+
+    function build() {
+        cache.clear();
+        fetch('./data/region.json')
+            .then(r => r.json())
+            .then(data => {
+                for (const [city, districts] of Object.entries(data)) {
+                    for (const [district, info] of Object.entries(districts)) {
+                        if (info.code != null) {
+                            cache.set(Number(info.code), `${city}${district}`);
+                        }
+                    }
+                }
+            })
+            .catch(e => console.warn('[RegionLookup] 載入 region.json 失敗:', e));
+    }
+
+    function getRegionName(code) {
+        return cache.get(Number(code)) || String(code);
+    }
+
+    build();
+    return { getRegionName };
+})();
+window.RegionLookup = RegionLookup;
+
 const chartPopup = document.getElementById('chart-popup');
 const tempChartCanvas = document.getElementById('temperature-chart');
 const windChartCanvas = document.getElementById('wind-chart');

@@ -234,21 +234,8 @@ class LayerMenu {
                 const groupLayer = parentGroup ? parentGroup.dataset.layer : null;
 
                 if (isParentItem) {
-                    // Toggle active state of children elements for visual expand/collapse
-                    const childUl = parentGroup.querySelector('ul.layer-group-children');
-                    const childItems = childUl ? childUl.querySelectorAll('.layer-item') : [];
-                    const anyChildActive = Array.from(childItems).some(el => el.classList.contains('active'));
-
-                    if (anyChildActive) {
-                        // Collapse: remove active from all children, remove active from parent
-                        childItems.forEach(el => el.classList.remove('active'));
-                        item.classList.remove('active');
-                    } else {
-                        // Expand: add active to all children, add active to parent
-                        childItems.forEach(el => el.classList.add('active'));
-                        item.classList.add('active');
-                    }
-                    // Don't call updateLayers() — parent click only toggles visual, not layer activation
+                    // Toggle only the parent's active class — don't touch children's active classes
+                    item.classList.toggle('active');
                     return;
                 } else if (item.classList.contains('child')) {
                     // Child item clicked
@@ -262,22 +249,24 @@ class LayerMenu {
 
                     // Update parent state
                     if (parentGroup) {
-                        const childLayers = parentGroup.dataset.children
-                            ? JSON.parse(parentGroup.dataset.children)
+                        const childUl = parentGroup.nextElementSibling;
+                        const someActive = childUl
+                            ? childUl.querySelectorAll('.layer-item').length > 0 && Array.from(childUl.querySelectorAll('.layer-item')).some(el => el.classList.contains('active'))
                             : groupLayer
-                                ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer)
-                                : [];
+                                ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer).some(l => this.activeLayers.has(l))
+                                : false;
 
-                        const someActive = childLayers.some(l => this.activeLayers.has(l));
                         if (someActive) {
                             parentGroup.classList.add('active');
                         } else {
                             parentGroup.classList.remove('active');
                         }
                     }
+
                     this.updateLayers();
                 } else {
                     // Regular item (not parent, not child)
+                    const parentGroup = item.closest('.layer-group.parent');
                     if (this.activeLayers.has(layer)) {
                         this.activeLayers.delete(layer);
                         item.classList.remove('active');
@@ -298,6 +287,23 @@ class LayerMenu {
                             });
                         }
                     }
+
+                    // Update parent state if this item is in a parent group
+                    if (parentGroup) {
+                        const childUl = parentGroup.nextElementSibling;
+                        const someActive = childUl
+                            ? childUl.querySelectorAll('.layer-item').length > 0 && Array.from(childUl.querySelectorAll('.layer-item')).some(el => el.classList.contains('active'))
+                            : groupLayer
+                                ? (exclusiveGroups.find(g => g.includes(groupLayer)) || []).filter(l => l !== groupLayer).some(l => this.activeLayers.has(l))
+                                : false;
+
+                        if (someActive) {
+                            parentGroup.classList.add('active');
+                        } else {
+                            parentGroup.classList.remove('active');
+                        }
+                    }
+
                     this.updateLayers();
                 }
             });

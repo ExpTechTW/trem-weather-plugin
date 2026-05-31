@@ -49,25 +49,28 @@ window.rainfallLayer = {
 
             const features = data.regions
                 .filter(r => r.lat != null && r.lon != null && r.max_rain_mmh > 0)
-                .map(r => ({
-                    type: 'Feature',
-                    properties: {
-                        code: r.code,
-                        area: r.area,
-                        max_rain: r.max_rain_mmh,
-                        avg_rain: r.avg_rain_mmh,
-                        site: r.site,
-                        lat: r.lat,
-                        lon: r.lon,
-                        rain_timeseries: r.rain_timeseries,
-                        issue_time: data.issue_time_utc8 || "-:--",
-                        max_lead_minute: data.max_lead_minute || 0
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [r.lon, r.lat]
-                    }
-                }));
+                .map(r => {
+                    return {
+                        type: 'Feature',
+                        properties: {
+                            code: r.code,
+                            area: r.area,
+                            areaDisplay: RegionLookup ? RegionLookup.getRegionName(r.code) : r.area,
+                            max_rain: r.max_rain_mmh,
+                            avg_rain: r.avg_rain_mmh,
+                            site: r.site,
+                            lat: r.lat,
+                            lon: r.lon,
+                            rain_timeseries: r.rain_timeseries,
+                            issue_time: data.issue_time_utc8 || "-:--",
+                            max_lead_minute: data.max_lead_minute
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [r.lon, r.lat]
+                        }
+                    };
+                });
 
             map.getSource('rainfall-data').setData({
                 type: 'FeatureCollection',
@@ -103,8 +106,8 @@ function updateRainfallLegend(features) {
     </div>`;
 
     html += `<div style="margin-bottom: 8px; font-size: 12px; color: #ccc;">
-        發布時間: <strong>${issue}</strong>
-        &nbsp;|&nbsp; 最大預測: <strong>${maxLead}</strong> 分鐘
+        發布時間: <strong>${issue}</strong><br>
+        最大預測: <strong>${maxLead}</strong> 分鐘
     </div>`;
 
     html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between;">
@@ -118,7 +121,7 @@ function updateRainfallLegend(features) {
         html += `<tr style="background: ${rowBg}; cursor: pointer;"
                      onclick="window.rainfallFlyTo(${p.lat}, ${p.lon})">
             <td style="padding: 3px 4px; width: 20px; text-align: center; color: ${i < 3 ? '#ffeb3b' : '#fff'};">${i + 1}</td>
-            <td style="padding: 3px 4px;">${p.area}</td>
+            <td style="padding: 3px 4px;">${p.areaDisplay}</td>
             <td style="padding: 3px 4px; text-align: right; font-family: monospace;">${p.max_rain.toFixed(1)}</td>
             <td style="padding: 3px 4px; text-align: right; font-family: monospace; color: #aaa;">${p.avg_rain.toFixed(1)}</td>
         </tr>`;
@@ -143,7 +146,7 @@ window.rainfallFlyTo = function (lat, lon) {
 
 function updateRainfallCityInfo(data) {
     const infoEl = document.getElementById('rainfall-city-info');
-    if (infoEl) infoEl.textContent = `共 ${data.count} 個區域`;
+    if (infoEl) infoEl.textContent = `共 ${data.regions ? data.regions.length : data.count || 0} 個區域`;
 }
 
 // ── 建立圖例容器 ──
@@ -204,25 +207,28 @@ map.on('load', async function () {
 
     const features = data.regions
         .filter(r => r.lat != null && r.lon != null && r.max_rain_mmh > 0)
-        .map(r => ({
-            type: 'Feature',
-            properties: {
-                code: r.code,
-                area: r.area,
-                max_rain: r.max_rain_mmh,
-                avg_rain: r.avg_rain_mmh,
-                site: r.site,
-                lat: r.lat,
-                lon: r.lon,
-                rain_timeseries: r.rain_timeseries,
-                issue_time: data.issue_time_utc8 || "-:--",
-                max_lead_minute: data.max_lead_minute || 0
-            },
-            geometry: {
-                type: 'Point',
-                coordinates: [r.lon, r.lat]
-            }
-        }));
+        .map(r => {
+            return {
+                type: 'Feature',
+                properties: {
+                    code: r.code,
+                    area: r.area,
+                    areaDisplay: RegionLookup ? RegionLookup.getRegionName(r.code) : r.area,
+                    max_rain: r.max_rain_mmh,
+                    avg_rain: r.avg_rain_mmh,
+                    site: r.site,
+                    lat: r.lat,
+                    lon: r.lon,
+                    rain_timeseries: r.rain_timeseries,
+                    issue_time: data.issue_time_utc8 || "-:--",
+                    max_lead_minute: data.max_lead_minute
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [r.lon, r.lat]
+                }
+            };
+        });
 
     window.rainfallFeatures = features;
 
@@ -273,7 +279,7 @@ map.on('load', async function () {
         layout: {
             'visibility': 'none',
             'text-field': ['format',
-                ['get', 'area'],
+                ['get', 'areaDisplay'],
                 '\n',
                 ['get', 'max_rain'],
                 ' mm/h'
@@ -299,7 +305,7 @@ map.on('load', async function () {
             .setLngLat(e.lngLat)
             .setHTML(`
                 <div style="padding: 8px 12px; background: #1e1e1e; color: #e0e0e0; border-radius: 6px; min-width: 160px; font-size: 13px;">
-                    <div style="font-weight: bold; margin-bottom: 4px;">${props.area}</div>
+                    <div style="font-weight: bold; margin-bottom: 4px;">${RegionLookup ? RegionLookup.getRegionName(props.code) : props.area}</div>
                     <div>最大雨量: <strong>${props.max_rain.toFixed(1)} mm/h</strong></div>
                     <div>平均雨量: <strong>${props.avg_rain.toFixed(1)} mm/h</strong></div>
                     <div style="margin-top: 6px; font-size: 11px; color: #aaa;">
