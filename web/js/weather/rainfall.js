@@ -78,6 +78,8 @@ window.rainfallLayer = {
             });
 
             updateRainfallLegend(features, data);
+            window.rainfallFeatures = features;
+            window.rainfallData = data;
             updateRainfallCityInfo(data);
         } catch (err) {
             console.error('[rainfall] updateTime 失敗:', err);
@@ -136,7 +138,7 @@ window.rainfallToggleSort = function () {
     if (content) {
         const asc = content.getAttribute('data-sort-asc') === 'true';
         content.setAttribute('data-sort-asc', String(!asc));
-        updateRainfallLegend(window.rainfallFeatures || []);
+        updateRainfallLegend(window.rainfallFeatures || [], window.rainfallData || []);
     }
 };
 
@@ -231,6 +233,7 @@ map.on('load', async function () {
         });
 
     window.rainfallFeatures = features;
+    window.rainfallData = data;
 
     map.addSource('rainfall-data', {
         type: 'geojson',
