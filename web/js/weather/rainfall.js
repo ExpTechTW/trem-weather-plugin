@@ -77,9 +77,9 @@ window.rainfallLayer = {
                 features: features
             });
 
-            updateRainfallLegend(features, data);
             window.rainfallFeatures = features;
             window.rainfallData = data;
+            updateRainfallLegend(features, data);
             updateRainfallCityInfo(data);
         } catch (err) {
             console.error('[rainfall] updateTime 失敗:', err);
@@ -94,7 +94,8 @@ function updateRainfallLegend(features, data) {
     const content = document.getElementById('rainfall-legend-content');
     if (!content) return;
 
-    const sorted = [...features].sort((a, b) => b.properties.max_rain - a.properties.max_rain).slice(0, 20);
+    const asc = content.getAttribute('data-sort-asc') === 'true';
+    const sorted = [...features].sort((a, b) => (asc ? 1 : -1) * (a.properties.max_rain - b.properties.max_rain)).slice(0, 20);
     // const maxLead = Math.max(...features.map(f => f.properties.max_lead_minute || 0));
     // const issue = features.length > 0 ? features[0].properties.issue_time : '';
 
