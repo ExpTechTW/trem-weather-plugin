@@ -77,7 +77,7 @@ window.rainfallLayer = {
                 features: features
             });
 
-            updateRainfallLegend(features);
+            updateRainfallLegend(features, data);
             updateRainfallCityInfo(data);
         } catch (err) {
             console.error('[rainfall] updateTime 失敗:', err);
@@ -86,15 +86,15 @@ window.rainfallLayer = {
 };
 
 // ── 圖例更新 ──
-function updateRainfallLegend(features) {
+function updateRainfallLegend(features, data) {
     const container = document.getElementById('rainfall-legend-container');
     if (!container) return;
     const content = document.getElementById('rainfall-legend-content');
     if (!content) return;
 
     const sorted = [...features].sort((a, b) => b.properties.max_rain - a.properties.max_rain).slice(0, 20);
-    const maxLead = Math.max(...features.map(f => f.properties.max_lead_minute || 0));
-    const issue = features.length > 0 ? features[0].properties.issue_time : '';
+    // const maxLead = Math.max(...features.map(f => f.properties.max_lead_minute || 0));
+    // const issue = features.length > 0 ? features[0].properties.issue_time : '';
 
     let html = `<div style="margin-bottom: 10px;">
         <div style="margin-bottom: 5px; font-weight: bold;">圖例 (mm/h)</div>
@@ -106,8 +106,8 @@ function updateRainfallLegend(features) {
     </div>`;
 
     html += `<div style="margin-bottom: 8px; font-size: 12px; color: #ccc;">
-        發布時間: <strong>${issue}</strong><br>
-        最大預測: <strong>${maxLead}</strong> 分鐘
+        發布時間: <strong>${(data && data.issue_time_utc8) || features[0]?.properties.issue_time}</strong><br>
+        最大預測: <strong>${data?.max_lead_minute ?? (features[0]?.properties.max_lead_minute ?? 0)}</strong> 分鐘
     </div>`;
 
     html += `<div style="margin-bottom: 5px; font-weight: bold; display: flex; justify-content: space-between;">
@@ -326,8 +326,10 @@ map.on('load', async function () {
         map.getCanvas().style.cursor = '';
     });
 
+    window.rainfallFeatures = features;
+
     // 初始載入，預設隱藏
     // window.rainfallLayer.show();
-    updateRainfallLegend(features);
+    updateRainfallLegend(features, data);
     updateRainfallCityInfo(data);
 });
