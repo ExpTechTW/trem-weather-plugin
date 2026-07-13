@@ -281,6 +281,8 @@ const showHumidityChart = async (e) => {
     const textColor = '#f1f1f1';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
 
+    if (window.humidityChart) window.humidityChart.destroy();
+
     window.humidityChart = new Chart(humidityChartCanvas, {
         type: 'line',
         data: {

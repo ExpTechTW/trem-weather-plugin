@@ -10,7 +10,7 @@ const showAllChart = async (e) => {
     setChartTitle(stationName + ' - 全部數據');
     chartTypeSelect.value = 'all';
 
-    closeButton.onclick = function() {
+    const onCloseClick = function() {
         if (isLoading) {
             shouldStopLoading = true;
         }
@@ -19,12 +19,18 @@ const showAllChart = async (e) => {
             window.AllChart.destroy();
         }
     }
+    if (closeButton) {
+        closeButton.removeEventListener('click', onCloseClick);
+        closeButton.addEventListener('click', onCloseClick);
+    }
 
-    window.onclick = function(event) {
+    const onWindowClick = function(event) {
         if (event.target == chartPopup) {
             chartPopup.style.display = 'none';
         }
     }
+    window.removeEventListener('click', onWindowClick, true);
+    window.addEventListener('click', onWindowClick, true);
 
     const listResponse = await fetch('https://api-1.exptech.dev/api/v2/meteor/weather/list');
     const timeList = await listResponse.json();

@@ -266,6 +266,8 @@ const showTemperatureChart = async (e) => {
     const textColor = '#f1f1f1';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
 
+    if (window.temperatureChart) window.temperatureChart.destroy();
+
     window.temperatureChart = new Chart(tempChartCanvas, {
         type: 'line',
         data: {

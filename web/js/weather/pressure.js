@@ -281,6 +281,8 @@ const showPressureChart = async (e) => {
     const textColor = '#f1f1f1';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
 
+    if (window.pressureChart) window.pressureChart.destroy();
+
     window.pressureChart = new Chart(pressureChartCanvas, {
         type: 'line',
         data: {

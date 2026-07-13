@@ -1,3 +1,5 @@
+const STORAGE_KEY = 'trem_weather_active_layers';
+
 class LayerMenu {
     constructor() {
         this.activeLayers = new Set(['radar']);
@@ -22,12 +24,12 @@ class LayerMenu {
                     </svg>
                     雷達回波
                 </li>
-                <li class="layer-item" data-layer="radarRain">
+                <!--<li class="layer-item" data-layer="radarRain">
                     <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e8eaed">
                         <path d="M480.28-96Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm.06-72Q535-168 584-186t89-50l-51-52q-29.63 22.91-65.89 35.45Q519.84-240 480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 40-12.5 76T672-338l52 51q32-40.13 50-89.06 18-48.94 18-103.6 0-130.79-91-221.57Q610-792 480-792t-221 91q-91 91-91 221t90.77 221q90.78 91 221.57 91ZM480-312q25 0 47.5-7t42.5-20l-72-72q-4.5 2-9 2.5t-9 .5q-29.7 0-50.85-21.21Q408-450.43 408-480q0-29.7 21.21-50.85 21.21-21.15 51-21.15T531-530.96q21 21.04 21 50.59 0 5.37-1 9.37-1 4-2 9l72 72q12.91-19.76 19.96-42.26Q648-454.76 648-480q0-70-49-119t-119-49q-70 0-119 49t-49 119q0 70 49 119t119 49Z"/>
                     </svg>
                     降雨雷達
-                </li>
+                </li>-->
                 <li class="layer-item" data-layer="rain">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                         <path d="M338-204q-15 8-30.5 2.5T284-222L44-702q-8-15-2.5-30.5T62-756q15-8 30.5-2.5T116-738l240 480q8 15 2.5 30.5T338-204Zm187 0q-15 8-30.5 2.5T471-222L231-702q-8-15-2.5-30.5T249-756q15-8 30-2.5t23 20.5l241 480q8 15 2.5 30.5T525-204Zm187-1q-15 8-30.5 3T658-222L418-702q-8-15-2.5-30.5T436-756q15-8 30-2.5t23 20.5l241 480q8 15 2.5 30T712-205Zm186 1q-15 8-30.5 2.5T844-222L604-702q-8-15-2.5-30.5T622-756q15-8 30.5-2.5T676-738l240 480q8 15 2.5 30.5T898-204Z"/>
@@ -308,6 +310,18 @@ class LayerMenu {
                 }
             });
         });
+
+        // Persist active layers to localStorage on every change
+        const persistLayers = () => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(this.activeLayers)));
+        };
+
+        // Wrap updateLayers to also persist state
+        const originalUpdateLayers = this.updateLayers.bind(this);
+        this.updateLayers = () => {
+            originalUpdateLayers();
+            persistLayers();
+        };
     }
 
     updateLayers() {
@@ -331,7 +345,9 @@ class LayerMenu {
             if (layer) {
                 if (this.activeLayers.has(layerKey)) {
                     layer.show();
-                    layer.updateTime();
+                    if (map.getSource(`${layerKey}-data`)) {
+                        layer.updateTime();
+                    }
                 } else {
                     layer.hide();
                 }
@@ -373,6 +389,36 @@ class LayerMenu {
     }
 
     loadActiveLayer() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                let layers = JSON.parse(saved);
+                if (Array.isArray(layers)) {
+                    // Validate: ensure at most one from each exclusive group
+                    const exclusiveGroups = [
+                        ['radar', 'radarRain'],
+                        ['temperature', 'tempHigh', 'tempLow', 'tempDiffHigh'],
+                    ];
+                    for (const group of exclusiveGroups) {
+                        const present = layers.filter(l => group.includes(l));
+                        if (present.length > 1) {
+                            // Keep only the last selected one in each group
+                            layers = layers.filter(l => !group.includes(l)).concat(present.slice(-1));
+                        }
+                    }
+                    this.activeLayers = new Set(layers);
+                }
+            } catch (e) {
+                console.warn('[LayerMenu] Failed to load saved layer state:', e);
+            }
+        }
+        // Re-apply active classes to menu items
+        document.querySelectorAll('.layer-item').forEach(el => {
+            const layer = el.dataset.layer;
+            if (layer && this.activeLayers.has(layer)) {
+                el.classList.add('active');
+            }
+        });
         this.updateLayers();
     }
 

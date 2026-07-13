@@ -30,7 +30,7 @@ window.rainfallLayer = {
         }
         const legend = document.getElementById('rainfall-legend-container');
         if (legend) legend.style.display = 'none';
-        const city = document.getElementById('rainfall-city-dropdown');
+        const city = document.querySelector('.rainfall-city-container');
         if (city) city.style.display = 'none';
     },
 
@@ -100,7 +100,7 @@ function updateRainfallLegend(features, data) {
     // const issue = features.length > 0 ? features[0].properties.issue_time : '';
 
     let html = `<div style="margin-bottom: 10px;">
-        <div style="margin-bottom: 5px; font-weight: bold;">圖例 (mm/h)</div>
+        <div style="margin-bottom: 5px; font-weight: bold;">圖例 (?)</div>
         <div style="background: linear-gradient(to right, #e0f0ff 0%, #4fc3f7 10%, #29b6f6 20%, #4caf50 35%, #ffeb3b 50%, #ff9800 65%, #f44336 75%, #d32f2f 85%, #b71c1c 95%, #3e2723 100%);
                      height: 14px; border-radius: 7px; border: 1px solid #555;"></div>
         <div style="display: flex; justify-content: space-between; margin-top: 4px; color: #ddd; font-size: 11px;">
@@ -178,7 +178,7 @@ function createRainfallLegendContainer() {
 
         const content = document.createElement('div');
         content.id = 'rainfall-legend-content';
-        content.style.cssText = 'overflow: hidden;';
+        content.style.cssText = 'overflow: hidden; display: none;';
         container.appendChild(content);
 
         // 雨量資訊元素
@@ -286,7 +286,7 @@ map.on('load', async function () {
                 ['get', 'areaDisplay'],
                 '\n',
                 ['get', 'max_rain'],
-                ' mm/h'
+                ' ?'
             ],
             'text-size': 11,
             'text-font': ['Noto Sans Regular'],
@@ -305,23 +305,113 @@ map.on('load', async function () {
     // ── 點擊事件 ──
     map.on('click', 'rainfall-circles', function (e) {
         const props = e.features[0].properties;
+        const name = RegionLookup ? RegionLookup.getRegionName(props.code) : props.area;
+        const maxLead = props.max_lead_minute || 60;
+
+        // 建立 chart canvas
+        const chartCanvasId = 'rainfall-chart-' + props.code;
+        const existingCanvas = document.getElementById(chartCanvasId);
+        if (existingCanvas) existingCanvas.remove();
+        const canvasHtml = `<canvas id="${chartCanvasId}" style="width: 100%; max-width: 200px; margin-top: 6px;"></canvas>`;
+
         const popup = new maplibregl.Popup({ className: 'rainfall-popup' })
             .setLngLat(e.lngLat)
             .setHTML(`
-                <div style="padding: 8px 12px; background: #1e1e1e; color: #e0e0e0; border-radius: 6px; min-width: 160px; font-size: 13px;">
-                    <div style="font-weight: bold; margin-bottom: 4px;">${RegionLookup ? RegionLookup.getRegionName(props.code) : props.area}</div>
-                    <div>最大雨量: <strong>${props.max_rain.toFixed(1)} mm/h</strong></div>
-                    <div>平均雨量: <strong>${props.avg_rain.toFixed(1)} mm/h</strong></div>
+                <div style="padding: 8px 12px; background: #1e1e1e; color: #e0e0e0; border-radius: 6px; font-size: 13px; min-width: 200px;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">${name}</div>
+                    <div>最大雨量: <strong>${props.max_rain.toFixed(1)} ?</strong></div>
+                    <div>平均雨量: <strong>${props.avg_rain.toFixed(1)} ?</strong></div>
                     <div style="margin-top: 6px; font-size: 11px; color: #aaa;">
                         發布時間: ${props.issue_time}
                     </div>
                     <div style="font-size: 11px; color: #aaa;">
-                        最大預測: ${props.max_lead_minute} 分鐘
+                        最大預測: ${maxLead} 分鐘
                     </div>
+                    ${canvasHtml}
                 </div>
             `);
         popup.addTo(map);
+
+        // 等 DOM 渲染完再建 chart
+        setTimeout(() => {
+            console.log('[rainfall] 點擊', name, 'timeseries=', props.rain_timeseries, 'type=', typeof props.rain_timeseries);
+            updateRainfallTimeseriesChart(chartCanvasId, props.rain_timeseries, maxLead);
+        }, 0);
     });
+
+    // ── 雨量預測 Timeseries Chart ──
+    const updateRainfallTimeseriesChart = (canvasId, timeseries, maxLeadMinute) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        // destroy old chart if exists
+        if (window[`RainfallChart_${canvasId}`]) {
+            try { window[`RainfallChart_${canvasId}`].destroy(); } catch (e) {}
+        }
+
+        // 防禦：確保 timeseries 是 array
+        let arr = timeseries;
+        if (!Array.isArray(arr)) {
+            if (typeof arr === 'string') {
+                try { arr = JSON.parse(arr); } catch (_) { return; }
+            } else {
+                console.warn('[rainfall] rain_timeseries 不是 array:', arr);
+                return;
+            }
+        }
+
+        const n = arr.length;
+        if (n === 0) return;
+
+        // 時間標籤：每 maxLeadMinute/n 分鐘一格
+        const labels = arr.map((_, i) => {
+            const mins = (maxLeadMinute / n) * i;
+            return mins === 0 ? '現在' : `${Math.round(mins)} 分鐘後`;
+        });
+
+        const ctx = canvas.getContext('2d');
+        window[`RainfallChart_${canvasId}`] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '雨量 (?)',
+                    data: arr,
+                    borderColor: 'rgba(79, 195, 247, 1)',
+                    backgroundColor: 'rgba(79, 195, 247, 0.1)',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    pointBackgroundColor: '#4fc3f7'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#333',
+                        titleColor: '#fff',
+                        bodyColor: '#ddd',
+                        cornerRadius: 4
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#999', font: { size: 9 }, maxRotation: 0 },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#999', font: { size: 9 } },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    }
+                }
+            }
+        });
+    };
+    window.updateRainfallTimeseriesChart = updateRainfallTimeseriesChart;
 
     map.on('mouseenter', 'rainfall-circles', function () {
         map.getCanvas().style.cursor = 'pointer';

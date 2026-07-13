@@ -7,6 +7,23 @@ function parseYYYYMMDDHHMMSS(s) {
     const minute = s.substring(10, 12);
     return new Date(`${year}-${month}-${day}T${hour}:${minute}:00`);
 }
+
+// 安全的 fetch JSON，處理 404 / HTML 回應
+async function fetchRainListJson() {
+    try {
+        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
+        if (!response.ok) {
+            console.warn('降雨雷達圖元清單 404 (API 可能尚未部署)');
+            return [[], [], []];
+        }
+        const text = await response.text();
+        return JSON.parse(text);
+    } catch (e) {
+        console.warn('降雨雷達圖元清單讀取失敗:', e);
+        return [[], [], []];
+    }
+}
+
 // 創建降雨雷達圖層控制器
 window.radarRainLayer = {
     show: function() {
@@ -35,18 +52,22 @@ window.radarRainLayer = {
         }
     },
     updateTime: async function(timeStr = undefined) {
-        // timeStr: yyyy-mm-dd hh:mm，若未傳則用最新
-        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
-        const timeList = await response.json();
+        let timeList = [[], [], []];
+        try {
+            const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
+            if (response.ok) {
+                timeList = await response.json();
+            }
+        } catch (e) {
+            console.warn('updateTime 讀取失敗:', e);
+        }
+
         for (let i = 0; i < 3; i++) {
-            let targetTime = timeList[i][0];
+            let targetTime = timeList[i][0] || '';
 
             if (timeStr) {
-                // 轉成 timestamp 字串（毫秒）
-                // timeList 內容為 timestamp 字串，需比對 yyyy-mm-dd hh:mm
-                const target = timeStr.replace(/-/g, '/'); // Safari 相容
+                const target = timeStr.replace(/-/g, '/');
                 const inputDate = new Date(target);
-                // 找最接近的時間
                 let minDiff = Infinity;
                 for (const t of timeList) {
                     const d = parseYYYYMMDDHHMMSS(t);
@@ -87,7 +108,6 @@ let radarRainPlayTimer = null;
 let isRadarRainPlaying = false;
 
 function createRadarRainPlayButton() {
-    // 將控制元件掛到 #radar-play-controls
     const controls = document.getElementById('radar-play-controls');
     let btn = document.getElementById('radar-play-btn');
     if (!btn) {
@@ -204,7 +224,6 @@ function createRadarRainButtons() {
         }
 
         button.onclick = () => {
-            // Reset background for all buttons
             buttons.forEach(btn => btn.style.background = '#232323');
             button.style.background = '#3a3b40';
 
@@ -228,27 +247,38 @@ async function startRadarRainPlay() {
     const btn = document.getElementById('radar-play-btn');
     btn.textContent = '⏸';
     btn.style.background = '#3a3b40';
-    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
-    const timeList = await response.json();
-    // 取得區間
+
+    let timeList = [[], [], []];
+    try {
+        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
+        if (response.ok) {
+            timeList = await response.json();
+        }
+    } catch (e) {
+        console.warn('降雨雷達播放讀取失敗:', e);
+    }
+
     const rangeSel = document.getElementById('radar-range-sel');
     let range = 24;
     if (rangeSel) range = parseInt(rangeSel.value, 10);
     let playList = timeList.slice(-range);
     if (range >= 9999) playList = timeList;
+    if (playList.length === 0) {
+        console.warn('降雨雷達播放：時間列表為空');
+        stopRadarRainPlay();
+        return;
+    }
+
     let idx = 0;
-    // 若目前 time-display 有值，從該時間開始，若是最新則從頭開始
     const timeDisplay = document.getElementById('time-display');
     if (timeDisplay && timeDisplay.textContent) {
         const match = timeDisplay.textContent.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/);
         if (match) {
             const val = `${match[1]}-${match[2]}-${match[3]} ${match[4]}:${match[5]}`;
-            // 最新時間字串
             const latest = playList[playList.length - 1];
             const latestDate = parseYYYYMMDDHHMMSS(latest);
             if (latestDate) {
                 const latestStr = `${latestDate.getFullYear()}-${String(latestDate.getMonth()+1).padStart(2,'0')}-${String(latestDate.getDate()).padStart(2,'0')} ${String(latestDate.getHours()).padStart(2,'0')}:${String(latestDate.getMinutes()).padStart(2,'0')}`;
-                // 若 val 接近 latestStr 且區間小於 range，從倒數 range 開始（1小時內）
                 if (val === latestStr || Math.abs(new Date(val).getTime() - latestDate.getTime()) < 3600000) {
                     if (playList.length > range) {
                         idx = (playList.length - 1) - range;
@@ -269,13 +299,12 @@ async function startRadarRainPlay() {
             }
         }
     }
-    // 取得速度
+
     const speedSel = document.getElementById('radar-speed-sel');
     let speed = 600;
     if (speedSel) speed = parseInt(speedSel.value, 10);
     radarRainPlayTimer = setInterval(() => {
         if (!isRadarRainPlaying) return;
-        // 將 playList[idx] 轉為 yyyy-mm-dd hh:mm
         const t = playList[idx];
         const d = parseYYYYMMDDHHMMSS(t);
         if (d) {
@@ -301,10 +330,18 @@ function stopRadarRainPlay() {
 createRadarRainButtons();
 
 map.on('load', async function () {
-    const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
-    const timeList = await response.json();
+    let timeList = [[], [], []];
+    try {
+        const response = await fetch('https://api-1.exptech.dev/api/v1/tiles/rain/list');
+        if (response.ok) {
+            timeList = await response.json();
+        }
+    } catch (e) {
+        console.warn('降雨雷達圖元清單讀取失敗:', e);
+    }
+
     for (let i = 0; i < 3; i++) {
-        const latestTime = timeList[i][0];
+        const latestTime = timeList[i][0] || '';
 
         const timeDisplay = document.getElementById('time-display');
         const date = parseYYYYMMDDHHMMSS(latestTime);
@@ -323,7 +360,12 @@ map.on('load', async function () {
             ],
             'tileSize': 256
         }).on('error', function(e) {
-            console.error(`降雨雷達${i}圖層載入錯誤:`, e.error);
+            const errMsg = e.error ? (typeof e.error === 'object' ? e.error.message : e.error) : String(e);
+            if (errMsg.includes('InvalidState') || errMsg.includes('decode')) {
+                console.warn(`降雨雷達${i}圖元解碼錯誤 (可安全忽略):`, errMsg);
+            } else {
+                console.error(`降雨雷達${i}圖層載入錯誤:`, errMsg);
+            }
         });
 
         map.addLayer({

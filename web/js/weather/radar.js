@@ -52,7 +52,7 @@ window.radarLayer = {
     }
 };
 
-resetButton.addEventListener('click', () => {
+resetButton?.addEventListener('click', () => {
     map.jumpTo({
         center: [120.2, 23.6],
         zoom: 6.6
@@ -237,7 +237,14 @@ map.on('load', async function () {
         ],
         'tileSize': 256
     }).on('error', function(e) {
-        console.error('雷達圖層載入錯誤:', e.error);
+        // e.error 可能是 maplibregl.TileImageLoadError 物件
+        const errMsg = e.error ? (typeof e.error === 'object' ? e.error.message : e.error) : String(e);
+        // InvalidStateError 通常是解碼問題（webp vs png, 或 tile 太小），不影響顯示
+        if (errMsg.includes('InvalidState') || errMsg.includes('decode') || errMsg.includes('InvalidStateError')) {
+            console.warn('雷達圖層圖元解碼錯誤 (可安全忽略):', errMsg);
+        } else {
+            console.error('雷達圖層圖元載入錯誤:', errMsg);
+        }
     });
 
     map.addLayer({

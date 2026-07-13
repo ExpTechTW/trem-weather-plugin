@@ -231,7 +231,7 @@ const showRainChart = async (e) => {
     setChartTitle(stationName + ' - 雨量');
     chartTypeSelect.value = 'rain';
 
-    closeButton.onclick = function() {
+    const onCloseClick = function() {
         if (isLoading) {
             shouldStopLoading = true;
         }
@@ -240,12 +240,18 @@ const showRainChart = async (e) => {
             window.rainChart.destroy();
         }
     }
+    if (closeButton) {
+        closeButton.removeEventListener('click', onCloseClick);
+        closeButton.addEventListener('click', onCloseClick);
+    }
 
-    window.onclick = function(event) {
+    const onWindowClick = function(event) {
         if (event.target == chartPopup) {
             chartPopup.style.display = 'none';
         }
     }
+    window.removeEventListener('click', onWindowClick, true);
+    window.addEventListener('click', onWindowClick, true);
 
     const listResponse = await fetch('https://api-1.exptech.dev/api/v2/meteor/rain/list');
     const timeList = await listResponse.json();
@@ -317,6 +323,10 @@ const showRainChart = async (e) => {
 
     const textColor = '#f1f1f1';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
+
+    if (window.rainChart) {
+        window.rainChart.destroy();
+    }
 
     window.rainChart = new Chart(rainChartCanvas, {
         type: 'line',
